@@ -9,6 +9,6 @@ import requests
 blueprint = flask.Blueprint('example', __name__, url_prefix="/example")
 
 
-@blueprint.route("/ping")
+@blueprint.route('/ping')
 def hello():
     return 'pong'
