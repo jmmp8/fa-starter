@@ -11,4 +11,4 @@ blueprint = flask.Blueprint('example', __name__, url_prefix="/example")
 
 @blueprint.route("/ping")
 def hello():
-  return 'pong'
+    return 'pong'
