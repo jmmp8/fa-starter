@@ -21,3 +21,8 @@ To run in production mode:
 - `ng build --prod`
 - `npm start`
 - navigate to http://localhost:8000 (or whatever your flask instance is)
+
+## Project Requirements document
+
+https://docs.google.com/document/d/1HsJqFBf08IhsVV0BiPsAR-zH5l9pEDSpzUcPsZCVxYQ/edit?usp=sharing
+
