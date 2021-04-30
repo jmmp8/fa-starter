@@ -1,0 +1,3 @@
+<button mat-raised-button class="login-button" (click)="logInOrOut()">{{user?"Log
+    Out":"Log In"}}</button>
+<label *ngIf="user" class="user-email-label">{{getUserEmail()}}</label>

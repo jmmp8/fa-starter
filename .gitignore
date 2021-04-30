@@ -45,3 +45,6 @@ testem.log
 .DS_Store
 Thumbs.db
 .env
+
+#Google Auth client id
+/src/client_id.ts
