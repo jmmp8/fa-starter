@@ -55,3 +55,9 @@ def fetch_sql(sql, num_rows=None):
 @blueprint.route('/test')
 def test():
     return 'pong!'
+
+
+@blueprint.route('/create_user/<email>')
+def create_user(email):
+
+    return
