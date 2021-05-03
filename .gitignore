@@ -49,3 +49,6 @@ Thumbs.db
 
 # Google Auth client id
 /src/client_id.ts
+
+# Database connection credentials
+/db_cred.py

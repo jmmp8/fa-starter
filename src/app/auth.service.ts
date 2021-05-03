@@ -5,7 +5,6 @@ import {g_client_id} from '../client_id';
 export class AuthService {
   private authInstance: gapi.auth2.GoogleAuth;
   private user?: gapi.auth2.GoogleUser;
-  private error: any;
 
   constructor() {
     this.initGoogleAuth();
@@ -31,21 +30,18 @@ export class AuthService {
     }
   }
 
-  private async logIn(): Promise<gapi.auth2.GoogleUser> {
-    return new Promise(
-        async () => {await this.authInstance.signIn().then(
-            user => this.user = user,
-            error => this.error = error,
-            )});
+  private async logIn(): Promise<void> {
+    this.user = await this.authInstance.signIn();
   }
 
   private async logOut(): Promise<void> {
-    await this.authInstance.signOut().then(() => this.user = undefined);
+    await this.authInstance.signOut();
+    this.user = undefined;
   }
 
   getUserEmail(): string|null {
     if (this.user) {
-      let profile = this.user.getBasicProfile();
+      const profile = this.user.getBasicProfile();
       return profile.getEmail();
     } else {
       return null;

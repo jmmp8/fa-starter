@@ -54,7 +54,7 @@ describe('LoginButtonComponent', () => {
   });
 
   it('should show a login button if the user is not logged in', async () => {
-    authServiceStub.user = null;
+    authServiceStub.user = undefined;
     fixture.detectChanges();
 
     const logInButton = await loader.getHarness(
@@ -62,13 +62,30 @@ describe('LoginButtonComponent', () => {
     expect(await logInButton.getText()).toContain('Log In');
   });
 
-  it('should attempt to log in or out when the button is clicked', async () => {
-    spyOn(authServiceStub, 'logInOrOut');
+  it('should attempt to log in when the button is clicked', async () => {
+    authServiceStub.user = undefined;
+
+    spyOn(authServiceStub, 'logIn');
+    spyOn(authServiceStub, 'logOut');
 
     const logInButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.login-button'}));
     await logInButton.click();
 
-    expect(authServiceStub.logInOrOut).toHaveBeenCalled();
+    expect(authServiceStub.logIn).toHaveBeenCalled();
+    expect(authServiceStub.logOut).not.toHaveBeenCalled();
   });
+
+  it('should attempt to log out when the button is clicked and the user is already logged in',
+     async () => {
+       spyOn(authServiceStub, 'logIn');
+       spyOn(authServiceStub, 'logOut');
+
+       const logInButton = await loader.getHarness(
+           MatButtonHarness.with({selector: '.login-button'}));
+       await logInButton.click();
+
+       expect(authServiceStub.logIn).not.toHaveBeenCalled();
+       expect(authServiceStub.logOut).toHaveBeenCalled();
+     });
 });

@@ -1,9 +1,20 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 export class AuthServiceStub {
-  user: string|null = 'test_user@test.com';
+  user: string|undefined = 'test_user@test.com';
 
-  async logInOrOut(): Promise<void> {}
+  async logInOrOut(): Promise<void> {
+    if (this.user) {
+      await this.logOut();
+    } else {
+      await this.logIn();
+    }
+  }
 
-  getUserEmail(): string|null {
+  async logIn(): Promise<void> {}
+
+  async logOut(): Promise<void> {}
+
+  getUserEmail(): string|undefined {
     return this.user;
   }
 }
