@@ -36,14 +36,14 @@ def execute_procedure(procedure_name, arguments):
         arguments (Dict): dictionary of arguments to pass the stored procedure
 
     Returns:
-        str: json serialized list of dictionaries representing the results
+        List[Dict]: List of dictionaries representing the results
           returned by the procedure
     """
     conn = connect()
     try:
         with conn.cursor() as cursor:
             cursor.callproc(procedure_name, args=arguments)
-            return flask.jsonify(cursor.fetchall())
+            return cursor.fetchall()
     finally:
         conn.commit()
         conn.close()
@@ -61,8 +61,8 @@ def execute_sql(sql, num_rows=None):
           Defaults to None, which will fetch all rows.
 
     Returns:
-    str: json serialized list of dictionaries representing the results
-      returned by the query
+        List[Dict]: List of dictionaries representing the results
+          returned by the query
     """
     conn = connect()
     try:
@@ -72,8 +72,28 @@ def execute_sql(sql, num_rows=None):
                 results = cursor.fetchmany(num_rows)
             else:
                 results = cursor.fetchall()
-            return flask.jsonify(results)
+            return results
     finally:
+        conn.close()
+
+
+def modify_sql(sql):
+    """Executes a SQL query and returns the number of modified rows
+
+    This function is specifically for modifying data, not for retrieving data.
+
+    Args:
+        sql (str): SQL query to run
+
+    Returns:
+        int: the number of rows modified
+    """
+    conn = connect()
+    try:
+        with conn.cursor() as cursor:
+            return cursor.execute(sql)
+    finally:
+        conn.commit()
         conn.close()
 
 
@@ -81,4 +101,4 @@ def execute_sql(sql, num_rows=None):
 def create_user(email):
     if not email:
         raise ValueError('Cannot create a user without an email')
-    return execute_procedure('create_user', [email])
+    return flask.jsonify(execute_procedure('create_user', [email]))
