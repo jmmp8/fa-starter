@@ -40,11 +40,12 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+/__pycache__
 
 # System Files
 .DS_Store
 Thumbs.db
 .env
 
-#Google Auth client id
+# Google Auth client id
 /src/client_id.ts
