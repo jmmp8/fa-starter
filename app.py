@@ -5,6 +5,7 @@ import flask_cors
 from dotenv import load_dotenv
 
 import db
+import db_cred
 import example
 
 load_dotenv()
@@ -22,6 +23,9 @@ if app.config['DEBUG']:
     app.config['API_URL'] = os.getenv(
         'DEBUG_API_URL') or 'http://localhost:5000'
     app.config['ORIGIN'] = os.getenv('DEBUG_ORIGIN') or 'http://localhost:4200'
+
+    # Set to testing database
+    db_cred.DB_NAME = db_cred.DB_NAME_TESTING
 
     flask_cors.CORS(app,
                     allow_headers='*',

@@ -1,11 +1,12 @@
-DELIMITER $$
 CREATE DEFINER=`root`@`%` PROCEDURE `create_user`(email VARCHAR(45))
 BEGIN
-    IF EXISTS (SELECT * FROM `user` AS u WHERE u.email = email)
-    THEN SELECT 0 AS 'created', id FROM `user` AS u WHERE u.email = email;
-    ELSE 
-        INSERT INTO `user` (email) VALUES (email);
-        SELECT 1 AS 'created', id FROM `user` AS u WHERE u.email = email;
+	DECLARE created bool DEFAULT 0;
+
+    IF NOT EXISTS (SELECT * FROM `user` AS u WHERE u.email = email)
+    THEN
+		SET created = 1;
+		INSERT INTO `user` (email) VALUES (email);        
     END IF;
-END$$
-DELIMITER ;
+    
+    SELECT created AS 'created', id, email FROM `user` AS u WHERE u.email = email;
+END

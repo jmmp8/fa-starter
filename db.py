@@ -28,8 +28,32 @@ def connect():
     return conn
 
 
-def fetch_sql(sql, num_rows=None):
+def execute_procedure(procedure_name, arguments):
+    """Executed a stored procedure on the database
+
+    Args:
+        procedure_name (str): the name of the stored procedure to execute
+        arguments (Dict): dictionary of arguments to pass the stored procedure
+
+    Returns:
+        str: json serialized list of dictionaries representing the results
+          returned by the procedure
+    """
+    conn = connect()
+    try:
+        with conn.cursor() as cursor:
+            cursor.callproc(procedure_name, args=arguments)
+            return flask.jsonify(cursor.fetchall())
+    finally:
+        conn.commit()
+        conn.close()
+
+
+def execute_sql(sql, num_rows=None):
     """Executes a SQL query and returns the results
+
+    This function is specifically for retrieving data.
+    Modifications will not be commited.
 
     Args:
         sql (str): SQL query to run
@@ -37,7 +61,8 @@ def fetch_sql(sql, num_rows=None):
           Defaults to None, which will fetch all rows.
 
     Returns:
-        List[Dict]: A list or the rows returned by the query as dictionaries.
+    str: json serialized list of dictionaries representing the results
+      returned by the query
     """
     conn = connect()
     try:
@@ -47,17 +72,13 @@ def fetch_sql(sql, num_rows=None):
                 results = cursor.fetchmany(num_rows)
             else:
                 results = cursor.fetchall()
-            return results
+            return flask.jsonify(results)
     finally:
         conn.close()
 
 
-@blueprint.route('/test')
-def test():
-    return 'pong!'
-
-
 @blueprint.route('/create_user/<email>')
 def create_user(email):
-
-    return
+    if not email:
+        raise ValueError('Cannot create a user without an email')
+    return execute_procedure('create_user', [email])
