@@ -4,10 +4,11 @@ import {Observable, of} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
+import {CreateUserResponse} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BackendServiceBase {
-  abstract createUser(email: string): Observable<void>;
+  abstract createUser(email: string): Observable<CreateUserResponse[]>;
 }
 
 @Injectable({providedIn: 'root'})
@@ -19,16 +20,15 @@ export class BackendService extends BackendServiceBase {
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (error: any): Observable<T> => {
-      console.error(`Error in ${operation}: ${error}`);
+    return (error: HttpErrorResponse): Observable<T> => {
+      console.error(`Error in ${operation}: `, error);
       return of(result as T);
     };
   }
 
-  createUser(email: string): Observable<void> {
+  createUser(email: string): Observable<CreateUserResponse[]> {
     const endpoint = `${this.url}/db/create_user/${email}`;
-    return this.http.get<void>(endpoint).pipe(
-        catchError(this.handleError<void>('createUser')));
+    return this.http.get<CreateUserResponse[]>(endpoint).pipe(
+        catchError(this.handleError<CreateUserResponse[]>('createUser', [])));
   }
 }
