@@ -2,11 +2,30 @@ import {Injectable} from '@angular/core';
 import {g_client_id} from '../client_id';
 
 @Injectable({providedIn: 'root'})
-export class AuthService {
+export abstract class BaseAuthService {
+  protected user?: gapi.auth2.GoogleUser|string;
+
+  async logInOrOut(): Promise<void> {
+    if (this.user) {
+      await this.logOut();
+    } else {
+      await this.logIn();
+    }
+  }
+
+  protected abstract logIn(): Promise<void>;
+  protected abstract logOut(): Promise<void>;
+
+  abstract getUserEmail(): string|undefined;
+}
+
+@Injectable({providedIn: 'root'})
+export class AuthService extends BaseAuthService {
   private authInstance: gapi.auth2.GoogleAuth;
-  private user?: gapi.auth2.GoogleUser;
+  protected user?: gapi.auth2.GoogleUser;
 
   constructor() {
+    super();
     this.initGoogleAuth();
   }
 
@@ -22,29 +41,21 @@ export class AuthService {
     });
   }
 
-  async logInOrOut(): Promise<void> {
-    if (this.user) {
-      await this.logOut();
-    } else {
-      await this.logIn();
-    }
-  }
-
-  private async logIn(): Promise<void> {
+  async logIn(): Promise<void> {
     this.user = await this.authInstance.signIn();
   }
 
-  private async logOut(): Promise<void> {
+  async logOut(): Promise<void> {
     await this.authInstance.signOut();
     this.user = undefined;
   }
 
-  getUserEmail(): string|null {
+  getUserEmail(): string|undefined {
     if (this.user) {
       const profile = this.user.getBasicProfile();
       return profile.getEmail();
     } else {
-      return null;
+      return undefined;
     }
   }
 }

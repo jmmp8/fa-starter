@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-export class AuthServiceStub {
-  user: string|undefined = 'test_user@test.com';
+import {BaseAuthService} from '../auth.service';
 
-  async logInOrOut(): Promise<void> {
-    if (this.user) {
-      await this.logOut();
-    } else {
-      await this.logIn();
-    }
+export class AuthServiceStub extends BaseAuthService {
+  protected user?: string = 'test_user@test.com';
+
+  clearUser() {
+    this.user = undefined;
+  }
+
+  setUser(userEmail: string) {
+    this.user = userEmail;
   }
 
   async logIn(): Promise<void> {}
-
   async logOut(): Promise<void> {}
 
   getUserEmail(): string|undefined {

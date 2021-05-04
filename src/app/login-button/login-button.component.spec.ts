@@ -51,19 +51,21 @@ describe('LoginButtonComponent', () => {
     if (!emailLabel) throw new Error('Failed to find user email label');
     const expectedEmail = authServiceStub.getUserEmail();
     expect(emailLabel.textContent).toContain(expectedEmail);
+    expect(component.getUserEmail()).toContain(expectedEmail);
   });
 
   it('should show a login button if the user is not logged in', async () => {
-    authServiceStub.user = undefined;
+    authServiceStub.clearUser();
     fixture.detectChanges();
 
     const logInButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.login-button'}));
     expect(await logInButton.getText()).toContain('Log In');
+    expect(component.getUserEmail()).toBeUndefined();
   });
 
   it('should attempt to log in when the button is clicked', async () => {
-    authServiceStub.user = undefined;
+    authServiceStub.clearUser();
 
     spyOn(authServiceStub, 'logIn');
     spyOn(authServiceStub, 'logOut');

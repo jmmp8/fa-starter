@@ -13,7 +13,7 @@ export class LoginButtonComponent {
     this.authService.logInOrOut();
   }
 
-  getUserEmail(): string|null {
+  getUserEmail(): string|undefined {
     return this.authService.getUserEmail();
   }
 }
