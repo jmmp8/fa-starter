@@ -26,7 +26,7 @@ export class LoginButtonComponent {
         console.error(
             'Failed to get a response from the backend for creating a user');
       } else {
-        console.log(response[0]);
+        console.log(response);
       }
     }
   }

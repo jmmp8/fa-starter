@@ -19,7 +19,7 @@ export class BackendServiceStub extends BaseBackendService {
     this.user = [{'id': 1, 'email': 'user@gmail.com'}];
   }
 
-  createUser(email: string): Observable<CreateUserResponse[]> {
+  createUser(email: string): Observable<CreateUserResponse> {
     let created = false;
     let userRow: User|undefined =
         this.user.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -33,6 +33,12 @@ export class BackendServiceStub extends BaseBackendService {
       this.user.push(userRow);
     }
 
-    return of([{'id': userRow.id, 'email': userRow.email, 'created': created}]);
+    return of({
+      'created': created,
+      'user': {
+        'id': userRow.id,
+        'email': userRow.email,
+      }
+    });
   }
 }

@@ -24,14 +24,14 @@ if app.config['DEBUG']:
         'DEBUG_API_URL') or 'http://localhost:5000'
     app.config['ORIGIN'] = os.getenv('DEBUG_ORIGIN') or 'http://localhost:4200'
 
-    # Set to testing database
-    db_cred.DB_NAME = db_cred.DB_NAME_TESTING
-
     flask_cors.CORS(app,
                     allow_headers='*',
                     origins=[app.config['ORIGIN']],
                     supports_credentials=True)
 else:
+    # Set to production database
+    db_cred.DB_NAME = db_cred.DB_NAME_PRODUCTION
+
     app.config['API_URL'] = os.getenv('PROD_API_URL')
 
 # Set the secret key to enable access to session data.

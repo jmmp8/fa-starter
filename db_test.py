@@ -28,7 +28,7 @@ class DbTest(absltest.TestCase):
         first_create_resp = json.loads(first_create.body)[0]
         self.assertTrue(first_create_resp['created'])
 
-        user_query = f'SELECT * FROM user WHERE user.email = "{self.test_email}"'
+        user_query = f'SELECT * FROM user WHERE user.email="{self.test_email}"'
         user_query_result = db.execute_sql(user_query)
         self.assertEqual(len(user_query_result), 1)
 

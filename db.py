@@ -3,8 +3,10 @@
 import flask
 import logging
 import pymysql
+import json
 
 import db_cred
+import models
 
 blueprint = flask.Blueprint('db', __name__, url_prefix='/db')
 
@@ -28,28 +30,7 @@ def connect():
     return conn
 
 
-def execute_procedure(procedure_name, arguments):
-    """Executed a stored procedure on the database
-
-    Args:
-        procedure_name (str): the name of the stored procedure to execute
-        arguments (Dict): dictionary of arguments to pass the stored procedure
-
-    Returns:
-        List[Dict]: List of dictionaries representing the results
-          returned by the procedure
-    """
-    conn = connect()
-    try:
-        with conn.cursor() as cursor:
-            cursor.callproc(procedure_name, args=arguments)
-            return cursor.fetchall()
-    finally:
-        conn.commit()
-        conn.close()
-
-
-def execute_sql(sql, num_rows=None):
+def execute_sql(sql, model=None, num_rows=None):
     """Executes a SQL query and returns the results
 
     This function is specifically for retrieving data.
@@ -57,6 +38,7 @@ def execute_sql(sql, num_rows=None):
 
     Args:
         sql (str): SQL query to run
+        model (type, optional): If supplied, attempts to
         num_rows (int, optional): The number of rows to query for.
           Defaults to None, which will fetch all rows.
 
@@ -72,7 +54,17 @@ def execute_sql(sql, num_rows=None):
                 results = cursor.fetchmany(num_rows)
             else:
                 results = cursor.fetchall()
+
+            # If a model was provided, try to convert
+            # each result into the model's type
+            if model:
+                results = [model(**r) for r in results]
+
             return results
+
+    except TypeError as te:
+        logging.error('Model failed to convert: %s', te)
+        return []
     finally:
         conn.close()
 
@@ -101,4 +93,32 @@ def modify_sql(sql):
 def create_user(email):
     if not email:
         raise ValueError('Cannot create a user without an email')
-    return flask.jsonify(execute_procedure('create_user', [email]))
+
+    # Check if the user already exists
+    get_user_sql = f"""
+        SELECT * FROM user WHERE user.email = "{email}"
+    """
+
+    results = execute_sql(get_user_sql, models.User)
+
+    created = False
+    if not results:
+        # There was no information for this user
+        # create a row for them
+        create_user_sql = f"""
+            INSERT INTO user (email) VALUES ("{email}")
+        """
+        modify_sql(create_user_sql)
+
+        results = execute_sql(get_user_sql, models.User)
+        created = True
+
+    # If the user is still not defined, throw an error
+    if not results:
+        raise ValueError(f'Failed to retrieve or create User: {email}')
+
+    val = {
+        'created': created,
+        'user': results[0],
+    }
+    return json.dumps(val, cls=models.ModelEncoder)

@@ -26,12 +26,9 @@ describe('BackendService', () => {
 
     // Call the backend create_user endpoint
     service.createUser(expectedEmail)
-        .subscribe((response: CreateUserResponse[]) => {
-          if (response.length != 1)
-            throw new Error(
-                'Expected create_user to give a non-empty response');
-          expect(response[0].created).toBeTrue();
-          expect(response[0].email).toEqual(expectedEmail);
+        .subscribe((response: CreateUserResponse) => {
+          expect(response.created).toBeTrue();
+          expect(response.user.email).toEqual(expectedEmail);
         });
 
     // Make sure we called the correct endpoint
@@ -41,11 +38,13 @@ describe('BackendService', () => {
 
     // Respond with some test information
     const resp: CreateUserResponse = {
-      'id': 1,
-      'email': expectedEmail,
       'created': true,
+      'user': {
+        'id': 1,
+        'email': expectedEmail,
+      },
     };
-    req.flush([resp]);
+    req.flush(resp);
 
     // Assert there are no extra requests
     controller.verify();

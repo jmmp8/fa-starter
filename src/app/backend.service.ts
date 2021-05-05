@@ -8,7 +8,7 @@ import {CreateUserResponse} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
-  abstract createUser(email: string): Observable<CreateUserResponse[]>;
+  abstract createUser(email: string): Observable<CreateUserResponse>;
 }
 
 @Injectable({providedIn: 'root'})
@@ -26,9 +26,9 @@ export class BackendService extends BaseBackendService {
     };
   }
 
-  createUser(email: string): Observable<CreateUserResponse[]> {
+  createUser(email: string): Observable<CreateUserResponse> {
     const endpoint = `${this.url}/db/create_user/${email}`;
-    return this.http.get<CreateUserResponse[]>(endpoint).pipe(
-        catchError(this.handleError<CreateUserResponse[]>('createUser', [])));
+    return this.http.get<CreateUserResponse>(endpoint).pipe(
+        catchError(this.handleError<CreateUserResponse>('createUser')));
   }
 }
