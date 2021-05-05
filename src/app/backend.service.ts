@@ -7,12 +7,12 @@ import {environment} from '../environments/environment';
 import {CreateUserResponse} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
-export abstract class BackendServiceBase {
+export abstract class BaseBackendService {
   abstract createUser(email: string): Observable<CreateUserResponse[]>;
 }
 
 @Injectable({providedIn: 'root'})
-export class BackendService extends BackendServiceBase {
+export class BackendService extends BaseBackendService {
   private url = environment.backend_url;
 
   constructor(private http: HttpClient) {
