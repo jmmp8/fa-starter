@@ -53,6 +53,6 @@ describe('AppComponent', () => {
 
   it('should default to the home page', () => {
     const location = TestBed.inject(Location);
-    expect(location.path()).toBe('/home/');
+    expect(location.path()).toBe('/home');
   });
 });

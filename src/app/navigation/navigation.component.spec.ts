@@ -1,8 +1,10 @@
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+import {Location} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
+import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {routes} from '../app-routing.module';
@@ -16,6 +18,8 @@ describe('NavigationComponent', () => {
   let component: NavigationComponent;
   let fixture: ComponentFixture<NavigationComponent>;
   let loader: HarnessLoader;
+  let location: Location;
+  let router: Router;
 
   beforeEach(async () => {
     authServiceStub = new AuthServiceStub();
@@ -36,6 +40,8 @@ describe('NavigationComponent', () => {
     fixture = TestBed.createComponent(NavigationComponent);
     component = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
+    location = TestBed.inject(Location);
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -48,8 +54,8 @@ describe('NavigationComponent', () => {
        const myPoemsNavButton = await loader.getHarness(
            MatButtonHarness.with({selector: '.my-poems-nav'}));
 
-       // Initially should not be disabled since the auth stub starts with a
-       // user
+       // Initially should not be disabled since the
+       // auth stub starts with a user
        expect(await myPoemsNavButton.isDisabled()).toBeFalse();
 
        authServiceStub.clearUser();
@@ -57,4 +63,26 @@ describe('NavigationComponent', () => {
 
        expect(await myPoemsNavButton.isDisabled()).toBeTrue();
      });
+
+  it('should navigate to the My Poems page', async () => {
+    const myPoemsNavButton = await loader.getHarness(
+        MatButtonHarness.with({selector: '.my-poems-nav'}));
+    await myPoemsNavButton.click();
+
+    fixture.detectChanges();
+    expect(location.path()).toBe('/my_poems');
+  });
+
+  it('should navigate to the Home page', async () => {
+    // Default is home page, first navigate off
+    await router.navigate(['/my_poems']);
+    expect(location.path()).toBe('/my_poems');
+
+    const homeNavButton =
+        await loader.getHarness(MatButtonHarness.with({selector: '.home-nav'}));
+    await homeNavButton.click();
+
+    fixture.detectChanges();
+    expect(location.path()).toBe('/home');
+  });
 });
