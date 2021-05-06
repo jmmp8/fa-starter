@@ -11,6 +11,7 @@ import {ExampleComponent} from './example/example.component';
 import {HomeComponent} from './home/home.component';
 import {LoginButtonComponent} from './login-button/login-button.component';
 import {MaterialModule} from './material/material.module';
+import {MyPoemsComponent} from './my-poems/my-poems.component';
 import {NavigationComponent} from './navigation/navigation.component';
 
 @NgModule({
@@ -20,6 +21,7 @@ import {NavigationComponent} from './navigation/navigation.component';
     LoginButtonComponent,
     HomeComponent,
     NavigationComponent,
+    MyPoemsComponent,
   ],
   imports: [
     BrowserModule,
