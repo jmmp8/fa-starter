@@ -1,0 +1,4 @@
+<nav class="nav-buttons">
+    <a mat-flat-button class="home-nav" [routerLink]="['home/']" [color]="router.url=='/home/'?'primary':''">Home</a>
+    <a mat-flat-button class="my-poems-nav" [disabled]="!userIsLoggedIn()">My Poems</a>
+</nav>
