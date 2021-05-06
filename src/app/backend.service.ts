@@ -27,7 +27,7 @@ export class BackendService extends BaseBackendService {
   }
 
   createUser(email: string): Observable<CreateUserResponse> {
-    const endpoint = `${this.url}/db/create_user/${email}`;
+    const endpoint = `${this.url}/api/create_user/${email}`;
     return this.http.get<CreateUserResponse>(endpoint).pipe(
         catchError(this.handleError<CreateUserResponse>('createUser')));
   }

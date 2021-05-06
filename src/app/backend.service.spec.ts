@@ -33,7 +33,7 @@ describe('BackendService', () => {
 
     // Make sure we called the correct endpoint
     const req =
-        controller.expectOne(`${backendUrl}/db/create_user/${expectedEmail}`);
+        controller.expectOne(`${backendUrl}/api/create_user/${expectedEmail}`);
     expect(req.request.method).toEqual('GET');
 
     // Respond with some test information
