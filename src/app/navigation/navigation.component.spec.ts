@@ -65,24 +65,32 @@ describe('NavigationComponent', () => {
      });
 
   it('should navigate to the My Poems page', async () => {
+    const expectedRoute = '/my_poems';
+
     const myPoemsNavButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.my-poems-nav'}));
+    expect(component.getButtonColor(expectedRoute)).toBe('basic');
     await myPoemsNavButton.click();
 
     fixture.detectChanges();
-    expect(location.path()).toBe('/my_poems');
+    expect(location.path()).toBe(expectedRoute);
+    expect(component.getButtonColor(expectedRoute)).toBe('primary');
   });
 
   it('should navigate to the Home page', async () => {
+    const expectedRoute = '/home';
+
     // Default is home page, first navigate off
     await router.navigate(['/my_poems']);
     expect(location.path()).toBe('/my_poems');
 
     const homeNavButton =
         await loader.getHarness(MatButtonHarness.with({selector: '.home-nav'}));
+    expect(component.getButtonColor(expectedRoute)).toBe('basic');
     await homeNavButton.click();
 
     fixture.detectChanges();
-    expect(location.path()).toBe('/home');
+    expect(location.path()).toBe(expectedRoute);
+    expect(component.getButtonColor(expectedRoute)).toBe('primary');
   });
 });
