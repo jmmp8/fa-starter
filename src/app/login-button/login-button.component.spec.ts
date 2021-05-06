@@ -3,6 +3,8 @@ import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatProgressSpinnerHarness} from '@angular/material/progress-spinner/testing';
 
 import {AuthService} from '../auth.service';
 import {BackendService} from '../backend.service';
@@ -27,6 +29,7 @@ describe('LoginButtonComponent', () => {
         .configureTestingModule({
           imports: [
             MatButtonModule,
+            MatProgressSpinnerModule,
           ],
           declarations: [LoginButtonComponent],
           providers: [
@@ -111,5 +114,12 @@ describe('LoginButtonComponent', () => {
 
     expect(backendServiceStub.createUser)
         .toHaveBeenCalledOnceWith(expectedEmail);
+  });
+
+  it('should show a spinner while login is in progress', async () => {
+    component.isLoggingIn = true;
+    const spinner = await loader.getHarness(
+        MatProgressSpinnerHarness.with({selector: '.login-spinner'}));
+    expect(spinner).toBeDefined();
   });
 });
