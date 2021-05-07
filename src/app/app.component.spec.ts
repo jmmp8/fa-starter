@@ -2,6 +2,7 @@ import {Location} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 
@@ -21,8 +22,9 @@ describe('AppComponent', () => {
     TestBed
         .configureTestingModule({
           imports: [
-            MatDividerModule,
             MatButtonModule,
+            MatDividerModule,
+            MatProgressSpinnerModule,
             RouterTestingModule.withRoutes(routes),
           ],
           declarations: [
@@ -53,6 +55,6 @@ describe('AppComponent', () => {
 
   it('should default to the home page', () => {
     const location = TestBed.inject(Location);
-    expect(location.path()).toBe('/home/');
+    expect(location.path()).toBe('/home');
   });
 });

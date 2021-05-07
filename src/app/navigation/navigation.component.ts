@@ -10,10 +10,14 @@ import {AuthService} from '../auth.service';
 export class NavigationComponent {
   constructor(
       private authService: AuthService,
-      public router: Router,
+      private router: Router,
   ) {}
 
   userIsLoggedIn(): boolean {
     return this.authService.getUserEmail() != undefined;
+  }
+
+  getButtonColor(route: string): string {
+    return this.router.url.startsWith(route) ? 'primary' : 'basic';
   }
 }

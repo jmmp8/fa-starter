@@ -1,5 +1,8 @@
-<button mat-raised-button class="login-button" (click)="logInOrOut()">
-    <span class="icon"></span>
-    {{getUserEmail()?"Sign Out":"Sign In with Google"}}
-</button>
-<label *ngIf="getUserEmail() as email" class="user-email-label">{{email}}</label>
+<div class="flex-horizontal" style="align-items: center;">
+    <button mat-raised-button class="login-button" (click)="logInOrOut()">
+        <span class="icon"></span>
+        {{getUserEmail()?"Sign Out":"Sign In with Google"}}
+    </button>
+    <mat-spinner *ngIf="isLoggingIn" diameter="25" class="login-spinner"></mat-spinner>
+    <label *ngIf="getUserEmail() as email" class="user-email-label">{{email}}</label>
+</div>
