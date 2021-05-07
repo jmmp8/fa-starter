@@ -5,12 +5,15 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
 
 import {AuthService} from '../auth.service';
+import {BackendService} from '../backend.service';
 import {AuthServiceStub} from '../testing/auth-service-stub';
+import {BackendServiceStub} from '../testing/backend-service-stub';
 
 import {LoginButtonComponent} from './login-button.component';
 
 describe('LoginButtonComponent', () => {
   let authServiceStub: AuthServiceStub;
+  let backendServiceStub: BackendServiceStub;
   let compiled: HTMLElement;
   let component: LoginButtonComponent;
   let fixture: ComponentFixture<LoginButtonComponent>;
@@ -18,6 +21,7 @@ describe('LoginButtonComponent', () => {
 
   beforeEach(async () => {
     authServiceStub = new AuthServiceStub();
+    backendServiceStub = new BackendServiceStub();
 
     await TestBed
         .configureTestingModule({
@@ -25,7 +29,10 @@ describe('LoginButtonComponent', () => {
             MatButtonModule,
           ],
           declarations: [LoginButtonComponent],
-          providers: [{provide: AuthService, useValue: authServiceStub}],
+          providers: [
+            {provide: AuthService, useValue: authServiceStub},
+            {provide: BackendService, useValue: backendServiceStub},
+          ],
         })
         .compileComponents();
   });
@@ -90,4 +97,19 @@ describe('LoginButtonComponent', () => {
        expect(authServiceStub.logIn).not.toHaveBeenCalled();
        expect(authServiceStub.logOut).toHaveBeenCalled();
      });
+
+  it('should call the backend to create a User', async () => {
+    const expectedEmail = authServiceStub.getUserEmail();
+    if (!expectedEmail)
+      throw new Error('Auth service stub did not have an email configured');
+    authServiceStub.clearUser();
+    spyOn(backendServiceStub, 'createUser');
+
+    const logInButton = await loader.getHarness(
+        MatButtonHarness.with({selector: '.login-button'}));
+    await logInButton.click();
+
+    expect(backendServiceStub.createUser)
+        .toHaveBeenCalledOnceWith(expectedEmail);
+  });
 });
