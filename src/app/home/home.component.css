@@ -1,3 +1,7 @@
-.home-tile-content {
+.home-content {
+    height: 100%;
+}
+
+.home-content .home-tile-content {
     height: 100%;
 }
