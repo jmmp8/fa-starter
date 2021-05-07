@@ -10,7 +10,7 @@ import {AppComponent} from './app.component';
 import {AuthService} from './auth.service';
 import {BackendService} from './backend.service';
 import {LoginButtonComponent} from './login-button/login-button.component';
-import {NavComponent} from './nav/nav.component';
+import {NavigationComponent} from './navigation/navigation.component';
 import {AuthServiceStub} from './testing/auth-service-stub';
 import {BackendServiceStub} from './testing/backend-service-stub';
 
@@ -28,7 +28,7 @@ describe('AppComponent', () => {
           declarations: [
             AppComponent,
             LoginButtonComponent,
-            NavComponent,
+            NavigationComponent,
           ],
           providers: [
             {provide: AuthService, useValue: new AuthServiceStub()},

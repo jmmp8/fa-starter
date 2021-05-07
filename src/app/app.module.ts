@@ -11,11 +11,16 @@ import {ExampleComponent} from './example/example.component';
 import {HomeComponent} from './home/home.component';
 import {LoginButtonComponent} from './login-button/login-button.component';
 import {MaterialModule} from './material/material.module';
-import { NavComponent } from './nav/nav.component';
+import {NavigationComponent} from './navigation/navigation.component';
 
 @NgModule({
-  declarations:
-      [AppComponent, ExampleComponent, LoginButtonComponent, HomeComponent, NavComponent],
+  declarations: [
+    AppComponent,
+    ExampleComponent,
+    LoginButtonComponent,
+    HomeComponent,
+    NavigationComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,

@@ -9,12 +9,12 @@ import {routes} from '../app-routing.module';
 import {AuthService} from '../auth.service';
 import {AuthServiceStub} from '../testing/auth-service-stub';
 
-import {NavComponent} from './nav.component';
+import {NavigationComponent} from './navigation.component';
 
-describe('NavComponent', () => {
+describe('NavigationComponent', () => {
   let authServiceStub: AuthServiceStub;
-  let component: NavComponent;
-  let fixture: ComponentFixture<NavComponent>;
+  let component: NavigationComponent;
+  let fixture: ComponentFixture<NavigationComponent>;
   let loader: HarnessLoader;
 
   beforeEach(async () => {
@@ -26,14 +26,14 @@ describe('NavComponent', () => {
             MatButtonModule,
             RouterTestingModule.withRoutes(routes),
           ],
-          declarations: [NavComponent],
+          declarations: [NavigationComponent],
           providers: [{provide: AuthService, useValue: authServiceStub}],
         })
         .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NavComponent);
+    fixture = TestBed.createComponent(NavigationComponent);
     component = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
