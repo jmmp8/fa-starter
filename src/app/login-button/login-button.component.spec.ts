@@ -52,7 +52,7 @@ describe('LoginButtonComponent', () => {
   it('should show a log out button and display the user\'s email', async () => {
     const logInButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.login-button'}));
-    expect(await logInButton.getText()).toContain('Log Out');
+    expect(await logInButton.getText()).toContain('Sign Out');
 
     const emailLabel = compiled.querySelector('.user-email-label');
     if (!emailLabel) throw new Error('Failed to find user email label');
@@ -67,7 +67,7 @@ describe('LoginButtonComponent', () => {
 
     const logInButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.login-button'}));
-    expect(await logInButton.getText()).toContain('Log In');
+    expect(await logInButton.getText()).toContain('Sign In with Google');
     expect(component.getUserEmail()).toBeUndefined();
   });
 

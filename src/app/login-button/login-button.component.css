@@ -1,5 +1,15 @@
 .login-button {
-    width: 85px;
+    color: #757575;
+    background-color: white;
+}
+
+.login-button span.icon {
+    background: url(../../assets/g-signin-icon.png) no-repeat;
+    background-size: contain;
+    float: left;
+    width: 25px;
+    height: 25px;
+    margin: 5px 5px 5px -5px
 }
 
 .user-email-label {
