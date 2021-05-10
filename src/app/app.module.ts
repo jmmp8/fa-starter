@@ -11,10 +11,10 @@ import {ExampleComponent} from './example/example.component';
 import {HomeComponent} from './home/home.component';
 import {LoginButtonComponent} from './login-button/login-button.component';
 import {MaterialModule} from './material/material.module';
+import {MyPoemsEditDialog} from './my-poems-edit-dialog/my-poems-edit-dialog.component';
+import {MyPoemsListComponent} from './my-poems-list/my-poems-list.component';
 import {MyPoemsComponent} from './my-poems/my-poems.component';
 import {NavigationComponent} from './navigation/navigation.component';
-import { MyPoemsEditDialogComponent } from './my-poems-edit-dialog/my-poems-edit-dialog.component';
-import { MyPoemsListComponent } from './my-poems-list/my-poems-list.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import { MyPoemsListComponent } from './my-poems-list/my-poems-list.component';
     HomeComponent,
     NavigationComponent,
     MyPoemsComponent,
-    MyPoemsEditDialogComponent,
+    MyPoemsEditDialog,
     MyPoemsListComponent,
   ],
   imports: [

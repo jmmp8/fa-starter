@@ -6,7 +6,7 @@ import {MatCardHarness} from '@angular/material/card/testing';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
 import {BackendService} from '../backend.service';
-import {MyPoemsEditDialogComponent} from '../my-poems-edit-dialog/my-poems-edit-dialog.component';
+import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.component';
 import {BackendServiceStub} from '../testing/backend-service-stub';
 
 import {MyPoemsListComponent} from './my-poems-list.component';
@@ -60,7 +60,7 @@ describe('MyPoemsListComponent', () => {
     // Check that the dialog open was called
     expect(dialog.open)
         .toHaveBeenCalledOnceWith(
-            MyPoemsEditDialogComponent,
+            MyPoemsEditDialog,
             {data: undefined},
         );
   });

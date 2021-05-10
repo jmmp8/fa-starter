@@ -9,13 +9,13 @@ import {Poem} from '../backend_response_types';
   templateUrl: './my-poems-edit-dialog.component.html',
   styleUrls: ['./my-poems-edit-dialog.component.css']
 })
-export class MyPoemsEditDialogComponent {
+export class MyPoemsEditDialog {
   poemName = '';
   poemText = '';
 
   constructor(
       private backendService: BackendService,
-      public dialogRef: MatDialogRef<MyPoemsEditDialogComponent>,
+      public dialogRef: MatDialogRef<MyPoemsEditDialog>,
       @Inject(MAT_DIALOG_DATA) public data: Poem,
   ) {}
 

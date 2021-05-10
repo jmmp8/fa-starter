@@ -13,12 +13,12 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {BackendService} from '../backend.service';
 import {BackendServiceStub} from '../testing/backend-service-stub';
 
-import {MyPoemsEditDialogComponent} from './my-poems-edit-dialog.component';
+import {MyPoemsEditDialog} from './my-poems-edit-dialog.component';
 
-describe('MyPoemsEditDialogComponent', () => {
+describe('MyPoemsEditDialog', () => {
   let backendServiceStub: BackendServiceStub;
-  let component: MyPoemsEditDialogComponent;
-  let fixture: ComponentFixture<MyPoemsEditDialogComponent>;
+  let component: MyPoemsEditDialog;
+  let fixture: ComponentFixture<MyPoemsEditDialog>;
   let loader: HarnessLoader;
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('MyPoemsEditDialogComponent', () => {
 
     await TestBed
         .configureTestingModule({
-          declarations: [MyPoemsEditDialogComponent],
+          declarations: [MyPoemsEditDialog],
           imports: [
             BrowserAnimationsModule,
             FormsModule,
@@ -44,7 +44,7 @@ describe('MyPoemsEditDialogComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MyPoemsEditDialogComponent);
+    fixture = TestBed.createComponent(MyPoemsEditDialog);
     component = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
@@ -54,7 +54,7 @@ describe('MyPoemsEditDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should disable the Submit button unless all fields are suplied',
+  it('should disable the Submit button unless all fields are supplied',
      async () => {
        const submitButton = await loader.getHarness(
            MatButtonHarness.with({selector: '.poem-edit-submit'}));
