@@ -1,0 +1,8 @@
+.poem-edit-form {
+    width: 500px;
+}
+
+.poem-edit-form .poem-name-field,
+.poem-edit-form .poem-text-field {
+    width: 100%;
+}
