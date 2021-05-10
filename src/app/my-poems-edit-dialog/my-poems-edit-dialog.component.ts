@@ -1,4 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {BackendService} from '../backend.service';
+
+import {Poem} from '../backend_response_types';
 
 @Component({
   selector: 'app-my-poems-edit-dialog',
@@ -6,15 +10,28 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./my-poems-edit-dialog.component.css']
 })
 export class MyPoemsEditDialogComponent {
-  submit(poemName: string, poemText: string): void {
-    console.log(poemName, poemText);
+  poemName = '';
+  poemText = '';
+
+  constructor(
+      private backendService: BackendService,
+      public dialogRef: MatDialogRef<MyPoemsEditDialogComponent>,
+      @Inject(MAT_DIALOG_DATA) public data: Poem,
+  ) {}
+
+  canSubmit(): boolean {
+    return (this.poemName.trim().length > 0) &&
+        (this.poemText.trim().length > 0);
   }
 
-  canSubmit(poemName: string, poemText: string): boolean {
-    return (poemName.trim().length > 0) && (poemText.trim().length > 0);
+  submit(): void {
+    if (this.canSubmit()) {
+      this.backendService.createPoem(this.poemName, this.poemText, false);
+    }
+    this.dialogRef.close();
   }
 
   cancel(): void {
-    console.log('canceling');
+    this.dialogRef.close();
   }
 }

@@ -6,3 +6,7 @@
 .poem-edit-form .poem-text-field {
     width: 100%;
 }
+
+.poem-edit-form button {
+    margin: 0px 5px;
+}

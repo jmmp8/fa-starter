@@ -1,19 +1,19 @@
 <h1>Poem Editor</h1>
-
 <form class="poem-edit-form" autocomplete="off">
-    <p>
-        <mat-form-field class="poem-name-field" appearance="fill" floatLabel="always">
-            <mat-label>Poem Name</mat-label>
-            <input matInput required #poemName>
-        </mat-form-field>
-    </p>
-    <p>
-        <mat-form-field class="poem-text-field" appearance="fill" floatLabel="always">
-            <mat-label>Poem Text</mat-label>
-            <textarea matInput required cdkTextareaAutosize cdkAutosizeMinRows="5" #poemText></textarea>
-        </mat-form-field>
-    </p>
-    <button mat-flat-button color="primary" [disabled]="!canSubmit(poemName.value, poemText.value)"
-        (click)="submit(poemName.value, poemText.value)">Submit</button>
-    <button mat-flat-button color="accent" (click)="cancel()">Cancel</button>
+
+    <mat-form-field class="poem-name-field" appearance="fill" floatLabel="always">
+        <mat-label>Poem Name</mat-label>
+        <input matInput required [(ngModel)]="poemName" [ngModelOptions]="{standalone: true}">
+    </mat-form-field>
+
+    <mat-form-field class="poem-text-field" appearance="fill" floatLabel="always">
+        <mat-label>Poem Text</mat-label>
+        <textarea matInput required cdkTextareaAutosize cdkAutosizeMinRows="5" [(ngModel)]=poemText
+            [ngModelOptions]="{standalone: true}"></textarea>
+    </mat-form-field>
+
+    <button class="poem-edit-submit" mat-flat-button color="primary" [disabled]="!canSubmit()"
+        (click)="submit()">Submit</button>
+
+    <button class="poem-edit-cancel" mat-flat-button color="accent" (click)="cancel()">Cancel</button>
 </form>

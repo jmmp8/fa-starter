@@ -9,6 +9,8 @@ import {CreateUserResponse} from './backend_response_types';
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
   abstract createUser(email: string): Observable<CreateUserResponse>;
+  abstract createPoem(poemName: string, poemText: string, generated: boolean):
+      void;
 }
 
 @Injectable({providedIn: 'root'})
@@ -30,5 +32,9 @@ export class BackendService extends BaseBackendService {
     const endpoint = `${this.url}/api/create_user/${email}`;
     return this.http.get<CreateUserResponse>(endpoint).pipe(
         catchError(this.handleError<CreateUserResponse>('createUser')));
+  }
+
+  createPoem(poemName: string, poemText: string, generated: boolean): void {
+    // Not Yet Implemented
   }
 }

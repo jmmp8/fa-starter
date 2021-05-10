@@ -36,4 +36,8 @@ export class BackendServiceStub extends BaseBackendService {
       }
     });
   }
+
+  createPoem(poemName: string, poemText: string, generated: boolean) {
+    // Not yet implemented
+  }
 }

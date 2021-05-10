@@ -1,7 +1,11 @@
-.my-poems-content {
+.my-poems-content,
+.my-poems-content mat-grid-list,
+.my-poems-content mat-grid-list mat-grid-tile {
     height: 100%;
 }
 
 .my-poems-content .my-poems-tile-content {
+    width: 100%;
     height: 100%;
+    text-align: center;
 }
