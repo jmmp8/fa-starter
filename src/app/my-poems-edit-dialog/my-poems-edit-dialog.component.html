@@ -1,15 +1,15 @@
 <h1>Poem Editor</h1>
 <form class="poem-edit-form" autocomplete="off">
 
-    <mat-form-field class="poem-name-field" appearance="fill" floatLabel="always">
+    <mat-form-field appearance="fill" floatLabel="always">
         <mat-label>Poem Name</mat-label>
-        <input matInput required [(ngModel)]="poemName" [ngModelOptions]="{standalone: true}">
+        <input class="poem-name-field" matInput required [(ngModel)]="poemName" [ngModelOptions]="{standalone: true}">
     </mat-form-field>
 
-    <mat-form-field class="poem-text-field" appearance="fill" floatLabel="always">
+    <mat-form-field appearance="fill" floatLabel="always">
         <mat-label>Poem Text</mat-label>
-        <textarea matInput required cdkTextareaAutosize cdkAutosizeMinRows="5" [(ngModel)]=poemText
-            [ngModelOptions]="{standalone: true}"></textarea>
+        <textarea class="poem-text-field" matInput required cdkTextareaAutosize cdkAutosizeMinRows="5"
+            [(ngModel)]=poemText [ngModelOptions]="{standalone: true}"></textarea>
     </mat-form-field>
 
     <button class="poem-edit-submit" mat-flat-button color="primary" [disabled]="!canSubmit()"

@@ -2,8 +2,7 @@
     width: 500px;
 }
 
-.poem-edit-form .poem-name-field,
-.poem-edit-form .poem-text-field {
+.poem-edit-form mat-form-field {
     width: 100%;
 }
 
