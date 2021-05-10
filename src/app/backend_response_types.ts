@@ -14,3 +14,32 @@ export interface CreateUserResponse {
   created: boolean;
   user: User;
 }
+
+// Models a row the poem table
+export enum PoemPrivacyLevel {
+  public,
+  private,
+}
+
+export enum PoemForm {
+  haiku,
+  sonnet,
+  tonka,
+}
+
+export interface Poem {
+  // Note, a poem in the database should never have a null id
+  // a null id indicates that the object has not been saved to the database
+  id: number|null;
+
+  user_id: number;
+  creation_timestamp: Date|null;
+  modified_timestamp: Date|null;
+  privacy_level: PoemPrivacyLevel;
+  archived: boolean;
+  form: PoemForm;
+  generated: boolean;
+  text: string;
+  num_likes: number;
+  num_dislikes: number;
+}

@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {Observable, of} from 'rxjs';
 import {BaseBackendService} from '../backend.service';
-import {CreateUserResponse} from '../backend_response_types';
-
-interface User {
-  id: number;
-  email: string;
-}
+import {CreateUserResponse, User} from '../backend_response_types';
 
 export class BackendServiceStub extends BaseBackendService {
   /* These properties replace the actual database tables for testing */

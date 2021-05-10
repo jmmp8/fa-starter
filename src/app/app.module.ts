@@ -13,6 +13,8 @@ import {LoginButtonComponent} from './login-button/login-button.component';
 import {MaterialModule} from './material/material.module';
 import {MyPoemsComponent} from './my-poems/my-poems.component';
 import {NavigationComponent} from './navigation/navigation.component';
+import { MyPoemsEditDialogComponent } from './my-poems-edit-dialog/my-poems-edit-dialog.component';
+import { MyPoemsListComponent } from './my-poems-list/my-poems-list.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import {NavigationComponent} from './navigation/navigation.component';
     HomeComponent,
     NavigationComponent,
     MyPoemsComponent,
+    MyPoemsEditDialogComponent,
+    MyPoemsListComponent,
   ],
   imports: [
     BrowserModule,
