@@ -74,7 +74,7 @@ describe('BackendService', () => {
     // Make sure we called the correct endpoint
     const req = controller.expectOne(
         `${backendUrl}/api/create_poem/${authServiceStub.getUserEmail()}/${
-            expectedPoemName}/${expectedPoemText}/${generated}`);
+            expectedPoemName}/${expectedPoemText}/${generated ? 1 : 0}`);
     expect(req.request.method).toEqual('GET');
 
     // Respond with some test information

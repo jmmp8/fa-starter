@@ -47,7 +47,7 @@ export class BackendService extends BaseBackendService {
 
     // User has been identified, create a poem for them
     const endpoint = `${this.url}/api/create_poem/${userEmail}/${poemName}/${
-        poemText}/${generated}`;
+        poemText}/${generated ? 1 : 0}`;
     return this.http.get<CreatePoemResponse>(endpoint).pipe(
         catchError(this.handleError<CreatePoemResponse>('createPoem')));
   }
