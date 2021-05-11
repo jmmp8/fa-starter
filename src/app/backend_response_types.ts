@@ -9,11 +9,12 @@ export interface User {
   email: string;
 }
 
-// Models the response for the /db/create_user/<email> endpoint
+// Models the response for the /api/create_user/<email> endpoint
 export interface CreateUserResponse {
   created: boolean;
   user: User;
 }
+
 
 // Models a row the poem table
 export enum PoemPrivacyLevel {
@@ -39,7 +40,14 @@ export interface Poem {
   archived: boolean;
   form: PoemForm;
   generated: boolean;
+  name: string;
   text: string;
   num_likes: number;
   num_dislikes: number;
+}
+
+// Models the response for the /api/create_user/<email> endpoint
+export interface CreatePoemResponse {
+  created: boolean;
+  poem: Poem;
 }
