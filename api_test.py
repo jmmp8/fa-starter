@@ -74,6 +74,10 @@ class DbTest(absltest.TestCase):
         db.session.add(poem)
         db.session.commit()
 
+        queried_poem = models.Poem.query.filter_by(user_id=user.id).first()
+
+        self.assertEqual(poem.id, queried_poem.id)
+
 
 if __name__ == '__main__':
     absltest.main()
