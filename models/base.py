@@ -1,6 +1,8 @@
 """Contains base class for SQLAlchemy models objects and custom JSON encoder"""
 
 import json
+from datetime import datetime
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -22,4 +24,8 @@ class ModelEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, BaseModel):
             return o.as_dict()
+        elif isinstance(o, datetime):
+            return str(o)
+        elif isinstance(o, Enum):
+            return str(o.value)
         return super().default(o)
