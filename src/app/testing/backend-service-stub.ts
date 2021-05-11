@@ -13,6 +13,7 @@ export class BackendServiceStub extends BaseBackendService {
 
     // Initialize fake tables with testing data
     this.user = [{'id': 1, 'email': 'user@gmail.com'}];
+    this.poem = [];
   }
 
   createUser(email: string): Observable<CreateUserResponse> {

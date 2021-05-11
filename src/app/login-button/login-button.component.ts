@@ -27,6 +27,7 @@ export class LoginButtonComponent {
             await firstValueFrom(this.backendService.createUser(userEmail));
 
         if (!response) {
+          console.log('bad response:', response);
           console.error(
               'Failed to get a response from the backend for creating a user');
         } else {

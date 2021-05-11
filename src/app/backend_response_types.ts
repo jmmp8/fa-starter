@@ -29,10 +29,7 @@ export enum PoemForm {
 }
 
 export interface Poem {
-  // Note, a poem in the database should never have a null id
-  // a null id indicates that the object has not been saved to the database
-  id: number|null;
-
+  id: number;
   user_id: number;
   creation_timestamp: Date|null;
   modified_timestamp: Date|null;
