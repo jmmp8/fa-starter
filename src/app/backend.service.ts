@@ -45,6 +45,11 @@ export class BackendService extends BaseBackendService {
     if (!userEmail)
       throw new Error('A user must be logged in before a poem can be createad');
 
+    // Replace new lines in poem text so that it encodes correctly.
+    // Also trim whitespace
+    poemName = poemName.trim();
+    poemText = poemText.trim().replace('\n', '%0A');
+
     // User has been identified, create a poem for them
     const endpoint = `${this.url}/api/create_poem/${userEmail}/${poemName}/${
         poemText}/${generated ? 1 : 0}`;
