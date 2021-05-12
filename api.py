@@ -31,10 +31,13 @@ def create_user(email):
     return json.dumps(result, cls=models.ModelEncoder)
 
 
-@blueprint.route(
-    '/create_poem/<user_email>/<poem_name>/<poem_text>/<int:generated>')
-def create_poem(user_email, poem_name, poem_text, generated):
-    generated = bool(generated)
+@blueprint.route('/create_poem', methods=['POST'])
+def create_poem():
+    body = flask.request.get_json()
+    user_email = body['userEmail']
+    poem_name = body['poemName']
+    poem_text = body['poemText']
+    generated = body['generated']
 
     # check that the user exists
     user = models.User.query.filter_by(email=user_email).first()

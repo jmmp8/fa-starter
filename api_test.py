@@ -69,10 +69,14 @@ class DbTest(absltest.TestCase):
         # Call the endpoint
         poem_name = 'test poem'
         poem_text = 'test\nthis is a poem\na very good one'
-        escaped_poem_text = poem_text.replace('\n', '%0A')
 
-        create = self.w.get(
-            f'/api/create_poem/{user.email}/{poem_name}/{escaped_poem_text}/0')
+        create = self.w.post_json(
+            '/api/create_poem', {
+                'userEmail': user.email,
+                'poemName': poem_name,
+                'poemText': poem_text,
+                'generated': False
+            })
         create_resp = json.loads(create.body)
         self.assertTrue(create_resp['created'])
 
