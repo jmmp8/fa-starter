@@ -1,4 +1,4 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {catchError} from 'rxjs/operators';
@@ -17,6 +17,9 @@ export abstract class BaseBackendService {
 @Injectable({providedIn: 'root'})
 export class BackendService extends BaseBackendService {
   private url = environment.backend_url;
+  private httpOptions = {
+    headers: new HttpHeaders({'Content-Type': 'application/json'})
+  }
 
   constructor(
       private auth: AuthService,
@@ -45,15 +48,18 @@ export class BackendService extends BaseBackendService {
     if (!userEmail)
       throw new Error('A user must be logged in before a poem can be createad');
 
-    // Replace new lines in poem text so that it encodes correctly.
-    // Also trim whitespace
-    poemName = poemName.trim();
-    poemText = poemText.trim().replace('\n', '%0A');
+    // Put parameters for creating the poem in request body
+    const requestBody = {
+      userEmail: userEmail,
+      poemName: poemName.trim(),
+      poemText: poemText.trim(),
+      generated: generated,
+    };
 
     // User has been identified, create a poem for them
-    const endpoint = `${this.url}/api/create_poem/${userEmail}/${poemName}/${
-        poemText}/${generated ? 1 : 0}`;
-    return this.http.get<CreatePoemResponse>(endpoint).pipe(
-        catchError(this.handleError<CreatePoemResponse>('createPoem')));
+    const endpoint = `${this.url}/api/create_poem`;
+    return this.http
+        .post<CreatePoemResponse>(endpoint, requestBody, this.httpOptions)
+        .pipe(catchError(this.handleError<CreatePoemResponse>('createPoem')));
   }
 }

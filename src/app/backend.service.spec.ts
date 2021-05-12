@@ -60,7 +60,7 @@ describe('BackendService', () => {
 
   it('should create poems', () => {
     const expectedPoemName = 'testName';
-    const expectedPoemText = 'testText';
+    const expectedPoemText = 'test text\nsecond line';
     const generated = false;
 
     // Call the backend create_poem endpoint
@@ -72,10 +72,15 @@ describe('BackendService', () => {
         });
 
     // Make sure we called the correct endpoint
-    const req = controller.expectOne(
-        `${backendUrl}/api/create_poem/${authServiceStub.getUserEmail()}/${
-            expectedPoemName}/${expectedPoemText}/${generated ? 1 : 0}`);
-    expect(req.request.method).toEqual('GET');
+    const req = controller.expectOne(`${backendUrl}/api/create_poem`);
+    expect(req.request.method).toEqual('POST');
+
+    // Make sure the body has all the parameters
+    const body = req.request.body;
+    expect(body.userEmail).toEqual(authServiceStub.getUserEmail());
+    expect(body.poemName).toEqual(expectedPoemName);
+    expect(body.poemText).toEqual(expectedPoemText);
+    expect(body.generated).toEqual(generated);
 
     // Respond with some test information
     const resp: CreatePoemResponse = {
