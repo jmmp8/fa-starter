@@ -113,12 +113,13 @@ def get_poems(poem_type, num_poems, user_email):
             'Retrieving newest poems has not yet been implemented')
 
     elif poem_type == 'manual':
-        query = models.Poem.query.filter_by(user_id=user.id, generated=False)
-        if num_poems > 0:
-            query = query.order_by(
+        query = models.Poem.query.filter_by(
+            user_id=user.id, generated=False).order_by(
                 models.Poem.modified_timestamp.desc(),
                 models.Poem.creation_timestamp.desc(),
-            ).limit(num_poems)
+            )
+        if num_poems > 0:
+            query = query.limit(num_poems)
         poems = query.all()
 
     elif poem_type == 'generated':

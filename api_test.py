@@ -139,7 +139,8 @@ class DbTest(absltest.TestCase):
         num_poems = 4
         all_poems = self.populate_poem_data(user.id, False, num_poems)
         all_poems.sort(
-            key=lambda p: p.modified_timestamp or p.creation_timestamp)
+            key=lambda p: p.modified_timestamp or p.creation_timestamp,
+            reverse=True)
 
         # Query for all the manual poems
         get = self.w.get(f'/api/get_poems/manual/0/{user.email}')
@@ -151,6 +152,34 @@ class DbTest(absltest.TestCase):
         for i in range(num_poems):
             poem = all_poems[i]
             manual_poem = all_manual_poems[i]
+            self.assertEqual(poem.name, manual_poem['name'])
+            self.assertEqual(poem.text, manual_poem['text'])
+            self.assertEqual(manual_poem['generated'], False)
+            self.assertEqual(manual_poem['user_id'], user.id)
+
+    @with_app_context
+    def test_get_some_manual_poems(self):
+        # First create the user to associate poems with
+        user = self.populate_user_data()
+
+        # Create some poems to query for
+        num_poems = 4
+        all_poems = self.populate_poem_data(user.id, False, num_poems)
+        all_poems.sort(
+            key=lambda p: p.modified_timestamp or p.creation_timestamp,
+            reverse=True)
+
+        # Query some of the poems
+        get_partial = self.w.get(
+            f'/api/get_poems/manual/{num_poems//2}/{user.email}')
+        get_partial_resp = json.loads(get_partial.body)
+        self.assertEqual(get_partial_resp['type'], 'manual')
+
+        some_manual_poems = get_partial_resp['poems']
+        self.assertEqual(len(some_manual_poems), num_poems // 2)
+        for i in range(num_poems // 2):
+            poem = all_poems[i]
+            manual_poem = some_manual_poems[i]
             self.assertEqual(poem.name, manual_poem['name'])
             self.assertEqual(poem.text, manual_poem['text'])
             self.assertEqual(manual_poem['generated'], False)
