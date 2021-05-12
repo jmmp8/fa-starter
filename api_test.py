@@ -2,7 +2,6 @@
 import json
 from absl.testing import absltest
 from flask_webtest import TestApp
-from datetime import datetime
 
 from app import app
 
@@ -70,13 +69,14 @@ class DbTest(absltest.TestCase):
         poem_name = 'test poem'
         poem_text = 'test\nthis is a poem\na very good one'
 
-        create = self.w.post_json(
-            '/api/create_poem', {
-                'userEmail': user.email,
-                'poemName': poem_name,
-                'poemText': poem_text,
-                'generated': False
-            })
+        request_body = {
+            'userEmail': user.email,
+            'poemName': poem_name,
+            'poemText': poem_text,
+            'generated': False
+        }
+
+        create = self.w.post_json('/api/create_poem', request_body)
         create_resp = json.loads(create.body)
         self.assertTrue(create_resp['created'])
 
@@ -90,6 +90,24 @@ class DbTest(absltest.TestCase):
         self.assertEqual(len(poem_query_result), 1)
         self.assertEqual(poem_query_result[0].name, poem_name)
         self.assertEqual(poem_query_result[0].text, poem_text)
+
+    @with_app_context
+    def test_create_poem_error(self):
+        # Call the endpoint without creating the user first
+        poem_name = 'test poem'
+        poem_text = 'test\nthis is a poem\na very good one'
+
+        request_body = {
+            'userEmail': self.test_email,
+            'poemName': poem_name,
+            'poemText': poem_text,
+            'generated': False
+        }
+
+        with self.assertRaises(ValueError) as context:
+            self.w.post_json('/api/create_poem', request_body)
+        self.assertTrue(
+            'Failed to find a user with email' in str(context.exception))
 
 
 if __name__ == '__main__':
