@@ -1,7 +1,7 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable, of, Subject} from 'rxjs';
-import {catchError, map, switchAll} from 'rxjs/operators';
+import {catchError, map, shareReplay, switchAll} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
@@ -11,8 +11,8 @@ import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse} from './backen
 export abstract class BaseBackendService {
   // Observables and subjects for the various types of poems
   protected manualPoemsSubject = new Subject<Observable<GetPoemsResponse>>();
-  readonly manualPoemsObservable = this.manualPoemsSubject.pipe(
-      switchAll(), map(response => response.poems));
+  readonly manualPoemsObservable$ = this.manualPoemsSubject.pipe(
+      switchAll(), map(response => response.poems), shareReplay());
 
   // Functions to create new information. The backend will create new rows in
   // the database

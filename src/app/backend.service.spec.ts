@@ -110,7 +110,7 @@ describe('BackendService', () => {
     const num_poems_to_get = 5;
 
     // Call the backend create_poem endpoint
-    service.manualPoemsObservable.subscribe(
+    service.manualPoemsObservable$.subscribe(
         poems => expect(poems.length).toBeLessThanOrEqual(num_poems_to_get));
     service.getManualPoems(num_poems_to_get);
 
