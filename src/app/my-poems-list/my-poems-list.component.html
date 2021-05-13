@@ -1,3 +1,12 @@
 <h1>My Poems</h1>
 
 <mat-card class="new-my-poems-card" (click)="openEditDialog()">New Poem</mat-card>
+
+<mat-card class="my-poem-card" *ngFor="let poem of myPoems$ | async">
+    <div class="my-poem-name">
+        <h3>{{poem.name}}</h3>
+    </div>
+    <div class="my-poem-text">
+        <label>{{poem.text}}</label>
+    </div>
+</mat-card>

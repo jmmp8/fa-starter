@@ -1,3 +1,11 @@
 .new-my-poems-card {
     cursor: pointer;
 }
+
+.my-poem-card .my-poem-name {
+    text-align: left;
+}
+
+.my-poem-card .my-poem-text {
+    white-space: pre;
+}
