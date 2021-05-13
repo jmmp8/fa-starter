@@ -1,14 +1,18 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {Observable, of, Subject} from 'rxjs';
+import {catchError, map, switchAll} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
-import {CreatePoemResponse, CreateUserResponse} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
+  protected manualPoemsSubject = new Subject<Observable<GetPoemsResponse>>();
+  readonly manualPoemsObservable = this.manualPoemsSubject.pipe(
+      switchAll(), map(response => response.poems));
+
   abstract createUser(email: string): Observable<CreateUserResponse>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
       Observable<CreatePoemResponse>;
@@ -61,5 +65,32 @@ export class BackendService extends BaseBackendService {
     return this.http
         .post<CreatePoemResponse>(endpoint, requestBody, this.httpOptions)
         .pipe(catchError(this.handleError<CreatePoemResponse>('createPoem')));
+  }
+
+  public getManualPoems(numPoems = 0): void {
+    this.manualPoemsSubject.next(this._getPoemsRequest('manual', numPoems));
+  }
+
+  protected _getPoemsRequest(poemType: string, numPoems: number):
+      Observable<GetPoemsResponse> {
+    let endpoint = `${this.url}/api/get_poems/${poemType}/${numPoems}`;
+    const userEmail: string|undefined = this.auth.getUserEmail();
+
+    if (poemType === 'manual') {
+      // There must be a user logged in to retrieve poems for
+      if (!userEmail)
+        throw new Error(
+            'A user must be logged in before a poems can be retrieved');
+
+      endpoint = `${endpoint}/${userEmail}`;
+      return this.http.get<GetPoemsResponse>(endpoint).pipe(
+          catchError(this.handleError<GetPoemsResponse>('getPoems')));
+    } else if (
+        poemType === 'best' || poemType === 'new' || poemType === 'generated') {
+      throw new Error(
+          `Retrieving poems not yet implemented for ${poemType} poems`);
+    } else {
+      throw new Error(`Unrecognized poem type: ${poemType}`);
+    }
   }
 }

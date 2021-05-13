@@ -5,7 +5,7 @@ import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
 
 import {BackendService} from './backend.service';
-import {CreatePoemResponse, CreateUserResponse, PoemForm, PoemPrivacyLevel} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, PoemForm, PoemPrivacyLevel} from './backend_response_types';
 import {AuthServiceStub} from './testing/auth-service-stub';
 
 describe('BackendService', () => {
@@ -99,6 +99,43 @@ describe('BackendService', () => {
         'num_likes': 0,
         'num_dislikes': 0,
       },
+    };
+    req.flush(resp);
+
+    // Assert there are no extra requests
+    controller.verify();
+  });
+
+  it('should retrieve manually written poems', () => {
+    const num_poems_to_get = 5;
+
+    // Call the backend create_poem endpoint
+    service.manualPoemsObservable.subscribe(
+        poems => expect(poems.length).toBeLessThanOrEqual(num_poems_to_get));
+    service.getManualPoems(num_poems_to_get);
+
+    // Make sure we called the correct endpoint
+    const req = controller.expectOne(`${backendUrl}/api/get_poems/manual/${
+        num_poems_to_get}/${authServiceStub.getUserEmail()}`);
+    expect(req.request.method).toEqual('GET');
+
+    // Respond with some test information
+    const resp: GetPoemsResponse = {
+      'type': 'manual',
+      'poems': [{
+        'id': 1,
+        'user_id': 1,
+        'creation_timestamp': new Date(),
+        'modified_timestamp': null,
+        'privacy_level': PoemPrivacyLevel.Public,
+        'archived': true,
+        'form': null,
+        'generated': false,
+        'name': 'test name',
+        'text': 'test text',
+        'num_likes': 0,
+        'num_dislikes': 0,
+      }],
     };
     req.flush(resp);
 

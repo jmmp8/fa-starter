@@ -48,3 +48,10 @@ export interface CreatePoemResponse {
   created: boolean;
   poem: Poem;
 }
+
+// Models the response for the /api/get_poems/<poemType>/<numPoems>/<email?>
+// endpoint
+export interface GetPoemsResponse {
+  type: string;
+  poems: Poem[];
+}
