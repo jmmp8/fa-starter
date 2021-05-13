@@ -2,6 +2,7 @@ import {Location} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatGridListModule} from '@angular/material/grid-list';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -24,6 +25,7 @@ describe('AppComponent', () => {
           imports: [
             MatButtonModule,
             MatDividerModule,
+            MatGridListModule,
             MatProgressSpinnerModule,
             RouterTestingModule.withRoutes(routes),
           ],
