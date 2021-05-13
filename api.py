@@ -59,7 +59,7 @@ def create_poem():
 @blueprint.route('/get_poems/<any(best, new):poem_type>/<int:num_poems>',
                  defaults={'user_email': None})
 @blueprint.route(
-    '/get_poems/<any(manual, generated):poem_type>/<int:num_poems>/<user_email>'
+    '/get_poems/<any(manual, liked, generated):poem_type>/<int:num_poems>/<user_email>'
 )
 def get_poems(poem_type, num_poems, user_email):
     """Retreives poems
@@ -69,6 +69,7 @@ def get_poems(poem_type, num_poems, user_email):
             best: returns poem with the highest likes - dislikes
             new: returns poems with the most recent creation timestamp
             manual: returns poems that the user manually wrote
+            liked: returns poems the user has liked
             generated: returns poems that the user generated
         num_poems (int): the number of poems to retrieve. 0 returns all poems
         user_email (string): The email of the user to retrieve poems for.
@@ -121,6 +122,10 @@ def get_poems(poem_type, num_poems, user_email):
         if num_poems > 0:
             query = query.limit(num_poems)
         poems = query.all()
+
+    elif poem_type == 'liked':
+        raise NotImplementedError(
+            'Retrieving liked poems has not yet been implemented')
 
     elif poem_type == 'generated':
         raise NotImplementedError(

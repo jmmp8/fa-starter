@@ -143,6 +143,7 @@ class DbTest(absltest.TestCase):
             reverse=True)
 
         # Query for all the manual poems
+        url = f'/api/get_poems/manual/0/{user.email}'
         get = self.w.get(f'/api/get_poems/manual/0/{user.email}')
         get_resp = json.loads(get.body)
         self.assertEqual(get_resp['type'], 'manual')
@@ -164,20 +165,21 @@ class DbTest(absltest.TestCase):
 
         # Create some poems to query for
         num_poems = 4
+        half_num_poems = num_poems // 2
         all_poems = self.populate_poem_data(user.id, False, num_poems)
         all_poems.sort(
             key=lambda p: p.modified_timestamp or p.creation_timestamp,
             reverse=True)
 
         # Query some of the poems
-        get_partial = self.w.get(
-            f'/api/get_poems/manual/{num_poems//2}/{user.email}')
+        url = f'/api/get_poems/manual/{half_num_poems}/{user.email}'
+        get_partial = self.w.get(url)
         get_partial_resp = json.loads(get_partial.body)
         self.assertEqual(get_partial_resp['type'], 'manual')
 
         some_manual_poems = get_partial_resp['poems']
-        self.assertEqual(len(some_manual_poems), num_poems // 2)
-        for i in range(num_poems // 2):
+        self.assertEqual(len(some_manual_poems), half_num_poems)
+        for i in range(half_num_poems):
             poem = all_poems[i]
             manual_poem = some_manual_poems[i]
             self.assertEqual(poem.name, manual_poem['name'])
@@ -188,7 +190,8 @@ class DbTest(absltest.TestCase):
     @with_app_context
     def test_get_manual_poems_error(self):
         with self.assertRaises(ValueError) as context:
-            self.w.get(f'/api/get_poems/manual/0/{self.test_email}')
+            url = f'/api/get_poems/manual/0/{self.test_email}'
+            self.w.get(url)
         self.assertTrue(
             'Failed to find a user with email' in str(context.exception))
 
