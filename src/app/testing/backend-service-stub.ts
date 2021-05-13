@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {Observable, of} from 'rxjs';
 import {BaseBackendService} from '../backend.service';
-import {CreatePoemResponse, CreateUserResponse, Poem, PoemForm, PoemPrivacyLevel, User} from '../backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem, PoemForm, PoemPrivacyLevel, User} from '../backend_response_types';
 
 export class BackendServiceStub extends BaseBackendService {
   /* These properties replace the actual database tables for testing */
@@ -52,7 +52,7 @@ export class BackendServiceStub extends BaseBackendService {
       'modified_timestamp': null,
       'privacy_level': PoemPrivacyLevel.Public,
       'archived': true,
-      'form': PoemForm.Haiku,
+      'form': null,
       'generated': generated,
       'name': poemName,
       'text': poemText,
@@ -66,5 +66,32 @@ export class BackendServiceStub extends BaseBackendService {
       'created': true,
       'poem': newPoem,
     });
+  }
+
+  getManualPoems(numPoems = 0): void {
+    // Sort the poems by modified timestamp or creation timestamp if no modified
+    // timestamp exists
+    const getSortValue = function(p: Poem) {
+      if (p.modified_timestamp) {
+        return p.modified_timestamp.getTime();
+      } else if (p.creation_timestamp) {
+        return p.creation_timestamp.getTime();
+      } else {
+        return 0;
+      }
+    };
+
+    // Retrieve manually written poems, sorted by timestamp, limited to numPoems
+    // entries
+    const manualPoems =
+        this.poem
+            .filter(
+                poem => !poem.generated && (poem.user_id == this.user[0].id))
+            .sort((a, b) => getSortValue(b) - getSortValue(a))
+            .slice(numPoems);
+
+    // Send the response to the manual poems subject
+    const response: GetPoemsResponse = {type: 'manual', poems: manualPoems};
+    this.manualPoemsSubject.next(of(response));
   }
 }

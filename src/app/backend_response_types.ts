@@ -35,7 +35,7 @@ export interface Poem {
   modified_timestamp: Date|null;
   privacy_level: PoemPrivacyLevel;
   archived: boolean;
-  form: PoemForm;
+  form: PoemForm|null;
   generated: boolean;
   name: string;
   text: string;

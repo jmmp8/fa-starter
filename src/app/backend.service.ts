@@ -5,17 +5,23 @@ import {catchError, map, switchAll} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
-import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
+  // Observables and subjects for the various types of poems
   protected manualPoemsSubject = new Subject<Observable<GetPoemsResponse>>();
   readonly manualPoemsObservable = this.manualPoemsSubject.pipe(
       switchAll(), map(response => response.poems));
 
+  // Functions to create new information. The backend will create new rows in
+  // the database
   abstract createUser(email: string): Observable<CreateUserResponse>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
       Observable<CreatePoemResponse>;
+
+  // Functions that trigger an update to a poem observable
+  abstract getManualPoems(numPoems: number): void;
 }
 
 @Injectable({providedIn: 'root'})
@@ -67,7 +73,7 @@ export class BackendService extends BaseBackendService {
         .pipe(catchError(this.handleError<CreatePoemResponse>('createPoem')));
   }
 
-  public getManualPoems(numPoems = 0): void {
+  getManualPoems(numPoems = 0): void {
     this.manualPoemsSubject.next(this._getPoemsRequest('manual', numPoems));
   }
 
