@@ -11,8 +11,7 @@ import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.co
   styleUrls: ['./my-poems-list.component.css']
 })
 export class MyPoemsListComponent implements OnInit {
-  readonly myPoems$: Observable<Poem[]> =
-      this.backendService.manualPoemsObservable$;
+  readonly myPoems$: Observable<Poem[]> = this.backendService.manualPoems$;
 
   constructor(
       private backendService: BackendService,
