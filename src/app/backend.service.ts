@@ -21,7 +21,11 @@ export abstract class BaseBackendService {
       Observable<CreatePoemResponse>;
 
   // Functions that trigger an update to a poem observable
+<<<<<<< HEAD
   abstract getManualPoems(numPoems: number): Promise<void>|Promise<Poem[]>;
+=======
+  abstract getManualPoems(numPoems: number): void|Poem[];
+>>>>>>> add test for displaying manually written poems
 }
 
 @Injectable({providedIn: 'root'})
