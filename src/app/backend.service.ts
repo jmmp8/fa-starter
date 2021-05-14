@@ -1,18 +1,18 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable, of, Subject} from 'rxjs';
-import {catchError, map, shareReplay, switchAll} from 'rxjs/operators';
+import {firstValueFrom, Observable, of, Subject} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
-import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
   // Observables and subjects for the various types of poems
-  protected manualPoemsSubject = new Subject<Observable<GetPoemsResponse>>();
-  readonly manualPoemsObservable$ = this.manualPoemsSubject.pipe(
-      switchAll(), map(response => response.poems), shareReplay());
+  protected manualPoemsSubject = new Subject<GetPoemsResponse>();
+  readonly manualPoems$ =
+      this.manualPoemsSubject.pipe(map(response => response.poems));
 
   // Functions to create new information. The backend will create new rows in
   // the database
@@ -21,7 +21,7 @@ export abstract class BaseBackendService {
       Observable<CreatePoemResponse>;
 
   // Functions that trigger an update to a poem observable
-  abstract getManualPoems(numPoems: number): void;
+  abstract getManualPoems(numPoems: number): Promise<void>|Promise<Poem[]>;
 }
 
 @Injectable({providedIn: 'root'})
@@ -73,8 +73,10 @@ export class BackendService extends BaseBackendService {
         .pipe(catchError(this.handleError<CreatePoemResponse>('createPoem')));
   }
 
-  getManualPoems(numPoems = 0): void {
-    this.manualPoemsSubject.next(this._getPoemsRequest('manual', numPoems));
+  async getManualPoems(numPoems = 0): Promise<void> {
+    const manualPoems =
+        await firstValueFrom(this._getPoemsRequest('manual', numPoems));
+    this.manualPoemsSubject.next(manualPoems);
   }
 
   protected _getPoemsRequest(poemType: string, numPoems: number):
@@ -92,7 +94,8 @@ export class BackendService extends BaseBackendService {
       return this.http.get<GetPoemsResponse>(endpoint).pipe(
           catchError(this.handleError<GetPoemsResponse>('getPoems')));
     } else if (
-        poemType === 'best' || poemType === 'new' || poemType === 'generated') {
+        poemType === 'best' || poemType === 'new' || poemType == 'liked' ||
+        poemType === 'generated') {
       throw new Error(
           `Retrieving poems not yet implemented for ${poemType} poems`);
     } else {

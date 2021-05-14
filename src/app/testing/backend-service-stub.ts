@@ -68,7 +68,7 @@ export class BackendServiceStub extends BaseBackendService {
     });
   }
 
-  getManualPoems(numPoems = 0): void {
+  async getManualPoems(numPoems = 0): Promise<void> {
     // Sort the poems by modified timestamp or creation timestamp if no modified
     // timestamp exists
     const getSortValue = function(p: Poem) {
@@ -92,6 +92,6 @@ export class BackendServiceStub extends BaseBackendService {
 
     // Send the response to the manual poems subject
     const response: GetPoemsResponse = {type: 'manual', poems: manualPoems};
-    this.manualPoemsSubject.next(of(response));
+    this.manualPoemsSubject.next(response);
   }
 }
