@@ -12,7 +12,7 @@ export class BackendServiceStub extends BaseBackendService {
     super();
 
     // Initialize fake tables with testing data
-    this.user = [{'id': 1, 'email': 'user@gmail.com'}];
+    this.user = [{'id': 1, 'email': 'test_user@gmail.com'}];
     this.poem = [{
       'id': 1,
       'user_id': this.user[0].id,
@@ -117,10 +117,12 @@ export class BackendServiceStub extends BaseBackendService {
 
     // Retrieve manually written poems, sorted by timestamp, limited to numPoems
     // entries
-    const manualPoems =
+    let manualPoems =
         this.poem.filter(poem => !poem.generated && (poem.user_id == userId))
-            .sort((a, b) => getSortValue(b) - getSortValue(a))
-            .slice(numPoems);
+            .sort((a, b) => getSortValue(b) - getSortValue(a));
+    if (manualPoems.length > numPoems && numPoems > 0) {
+      manualPoems = manualPoems.slice(0, numPoems);
+    }
 
     // Send the response to the manual poems subject
     if (triggerUpdate) {

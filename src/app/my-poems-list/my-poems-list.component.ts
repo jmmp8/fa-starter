@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterContentInit, AfterViewInit, Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {BackendService} from '../backend.service';
@@ -19,10 +19,6 @@ export class MyPoemsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.backendService.getManualPoems();
-  }
-
-  test() {
     this.backendService.getManualPoems();
   }
 

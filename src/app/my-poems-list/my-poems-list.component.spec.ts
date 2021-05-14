@@ -42,6 +42,7 @@ describe('MyPoemsListComponent', () => {
     component = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
+    backendServiceStub.getManualPoems();
   });
 
   it('should create', () => {
@@ -71,16 +72,14 @@ describe('MyPoemsListComponent', () => {
   it('should display the saved manual poems', async () => {
     let myPoemCards = await loader.getAllHarnesses(
         MatCardHarness.with({selector: '.my-poem-card'}));
-
     let expectedPoems =
         await backendServiceStub.getManualPoems(0, testUser.id, false);
 
-    // Check that there is one card for each manual poem
+    // Check that there is one card for each poem
     expect(myPoemCards.length).toEqual(expectedPoems.length);
 
     // Add a new manual poem and check again
     backendServiceStub.createPoem('new manual poem', 'some test text', false);
-
     myPoemCards = await loader.getAllHarnesses(
         MatCardHarness.with({selector: '.my-poem-card'}));
     expectedPoems =
@@ -90,5 +89,12 @@ describe('MyPoemsListComponent', () => {
     expect(myPoemCards.length).toEqual(expectedPoems.length);
 
     // Check the card contents
+    for (let i = 0; i < myPoemCards.length; i++) {
+      const card = myPoemCards[i];
+      const poem = expectedPoems[i];
+
+      expect(await card.getTitleText()).toContain(poem.name);
+      expect(await card.getText()).toContain(poem.text);
+    }
   });
 });
