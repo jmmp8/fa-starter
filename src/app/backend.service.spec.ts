@@ -58,10 +58,20 @@ describe('BackendService', () => {
     controller.verify();
   });
 
-  it('should create poems', () => {
+  it('should create manual poems', () => {
     const expectedPoemName = 'testName';
     const expectedPoemText = 'test text\nsecond line';
     const generated = false;
+
+    // Subscribe to the manual poems refresh
+    const manualPoems$ = service.getManualPoems();
+    manualPoems$.subscribe();
+
+    // Expect the initial manual poem fetch
+    let poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
+
 
     // Call the backend create_poem endpoint
     service.createPoem(expectedPoemName, expectedPoemText, generated)
@@ -102,26 +112,23 @@ describe('BackendService', () => {
     };
     req.flush(resp);
 
-    // Creating a poem also triggers a refetch of the manual poems
-    const poemsReq = controller.expectOne(`${
-        backendUrl}/api/get_poems/manual/0/${authServiceStub.getUserEmail()}`);
-    poemsReq.flush(null);
+    // Creting a poem also refreshes the list of poems
+    poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
 
     // Assert there are no extra requests
     controller.verify();
   });
 
   it('should retrieve manually written poems', () => {
-    const num_poems_to_get = 5;
-
-    // Call the backend create_poem endpoint
-    service.manualPoems$.subscribe(
-        poems => expect(poems.length).toBeLessThanOrEqual(num_poems_to_get));
-    service.getManualPoems(num_poems_to_get);
+    // Call the backend get_poems endpoint
+    const manualPoems$ = service.getManualPoems();
+    manualPoems$.subscribe(poems => expect(poems.length).toBeGreaterThan(0));
 
     // Make sure we called the correct endpoint
-    const req = controller.expectOne(`${backendUrl}/api/get_poems/manual/${
-        num_poems_to_get}/${authServiceStub.getUserEmail()}`);
+    const req = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
     expect(req.request.method).toEqual('GET');
 
     // Respond with some test information

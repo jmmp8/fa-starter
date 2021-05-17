@@ -1,7 +1,7 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {firstValueFrom, Observable, of, Subject} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, map, mergeMap, startWith, tap} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
@@ -9,19 +9,35 @@ import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
-  // Observables and subjects for the various types of poems
-  protected manualPoemsSubject = new Subject<GetPoemsResponse>();
-  readonly manualPoems$ =
-      this.manualPoemsSubject.pipe(map(response => response.poems));
+  // Subject emits whenever the list of poems needs to be refreshed
+  refreshManualPoemsSubject = new Subject<void>();
 
-  // Functions to create new information. The backend will create new rows in
-  // the database
+  // Observables for the various types of poems
+  readonly manualPoems$ = this.refreshManualPoemsSubject.pipe(
+      startWith(void 0),
+      mergeMap(() => this._getPoemsRequest('manual', 0)),
+      map(serverResponse => serverResponse.poems),
+  );
+
+  // Functions to create new information. The backend will create new rows
+  // in the database
   abstract createUser(email: string): Observable<CreateUserResponse>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
       Observable<CreatePoemResponse>;
 
-  // Functions that trigger an update to a poem observable
-  abstract getManualPoems(numPoems: number): Promise<void>|Promise<Poem[]>;
+  // Functions that trigger an update to a poem observable or return an
+  // observable that the front end can subscribe to
+  refreshManualPoems(): void {
+    this.refreshManualPoemsSubject.next();
+  }
+
+  getManualPoems(): Observable<Poem[]> {
+    return this.manualPoems$;
+  }
+
+  // Returns the http get Observable for fetching poems
+  protected abstract _getPoemsRequest(poemType: string, numPoems: number):
+      Observable<GetPoemsResponse>;
 }
 
 @Injectable({providedIn: 'root'})
@@ -72,14 +88,8 @@ export class BackendService extends BaseBackendService {
         .post<CreatePoemResponse>(endpoint, requestBody, this.httpOptions)
         .pipe(
             catchError(this.handleError<CreatePoemResponse>('createPoem')),
-            tap(_ => this.getManualPoems()),
+            tap(_ => this.refreshManualPoems()),
         );
-  }
-
-  async getManualPoems(numPoems = 0): Promise<void> {
-    const manualPoems =
-        await firstValueFrom(this._getPoemsRequest('manual', numPoems));
-    this.manualPoemsSubject.next(manualPoems);
   }
 
   protected _getPoemsRequest(poemType: string, numPoems: number):
