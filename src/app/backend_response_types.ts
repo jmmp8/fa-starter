@@ -9,11 +9,12 @@ export interface User {
   email: string;
 }
 
-// Models the response for the /db/create_user/<email> endpoint
+// Models the response for the /api/create_user/<email> endpoint
 export interface CreateUserResponse {
   created: boolean;
   user: User;
 }
+
 
 // Models a row the poem table
 export enum PoemPrivacyLevel {
@@ -28,10 +29,7 @@ export enum PoemForm {
 }
 
 export interface Poem {
-  // Note, a poem in the database should never have a null id
-  // a null id indicates that the object has not been saved to the database
-  id: number|null;
-
+  id: number;
   user_id: number;
   creation_timestamp: Date|null;
   modified_timestamp: Date|null;
@@ -39,7 +37,14 @@ export interface Poem {
   archived: boolean;
   form: PoemForm;
   generated: boolean;
+  name: string;
   text: string;
   num_likes: number;
   num_dislikes: number;
+}
+
+// Models the response for the /api/create_user/<email> endpoint
+export interface CreatePoemResponse {
+  created: boolean;
+  poem: Poem;
 }

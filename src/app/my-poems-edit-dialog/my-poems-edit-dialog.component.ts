@@ -1,5 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {firstValueFrom} from 'rxjs';
 import {BackendService} from '../backend.service';
 
 import {Poem} from '../backend_response_types';
@@ -24,9 +25,15 @@ export class MyPoemsEditDialog {
         (this.poemText.trim().length > 0);
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.canSubmit()) {
-      this.backendService.createPoem(this.poemName, this.poemText, false);
+      const response = await firstValueFrom(
+          this.backendService.createPoem(this.poemName, this.poemText, false));
+
+      if (!response) {
+        throw new Error(
+            'Failed to get a response from the backend for creating a poem');
+      }
     }
     this.dialogRef.close();
   }

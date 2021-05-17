@@ -7,6 +7,7 @@ CREATE TABLE `poem` (
   `archived` bit(1) NOT NULL DEFAULT b'0',
   `form` enum('haiku','sonnet','tonka') DEFAULT NULL,
   `generated` bit(1) NOT NULL DEFAULT b'0',
+  `name` varchar(45) NOT NULL,
   `text` varchar(8000) NOT NULL,
   `num_likes` int NOT NULL DEFAULT '0',
   `num_dislikes` int NOT NULL DEFAULT '0',
