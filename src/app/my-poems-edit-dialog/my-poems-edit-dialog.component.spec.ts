@@ -9,6 +9,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatInputHarness} from '@angular/material/input/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {of} from 'rxjs';
 
 import {BackendService} from '../backend.service';
 import {BackendServiceStub} from '../testing/backend-service-stub';
@@ -80,7 +81,9 @@ describe('MyPoemsEditDialog', () => {
      });
 
   it('should not create the poem if Cancel is clicked', async () => {
-    spyOn(backendServiceStub, 'createPoem');
+    // Set up backend service spy
+    const spyResponse = backendServiceStub.createPoem('test', 'test', false);
+    spyOn(backendServiceStub, 'createPoem').and.returnValue(spyResponse);
 
     const cancelButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.poem-edit-cancel'}));
@@ -90,7 +93,13 @@ describe('MyPoemsEditDialog', () => {
   });
 
   it('should should create the poem if Submit is clicked', async () => {
-    spyOn(backendServiceStub, 'createPoem');
+    const testName = 'testName';
+    const testPoem = 'testPoem';
+
+    // Set up backend service spy
+    const spyResponse =
+        backendServiceStub.createPoem(testName, testPoem, false);
+    spyOn(backendServiceStub, 'createPoem').and.returnValue(spyResponse);
 
     const submitButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.poem-edit-submit'}));
@@ -99,8 +108,6 @@ describe('MyPoemsEditDialog', () => {
     const poemTextField = await loader.getHarness(
         MatInputHarness.with({selector: '.poem-text-field'}));
 
-    const testName = 'testName';
-    const testPoem = 'testPoem';
     await poemNameField.setValue(testName);
     await poemTextField.setValue(testPoem);
     await submitButton.click();

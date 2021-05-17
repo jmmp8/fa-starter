@@ -35,7 +35,7 @@ export interface Poem {
   modified_timestamp: Date|null;
   privacy_level: PoemPrivacyLevel;
   archived: boolean;
-  form: PoemForm;
+  form: PoemForm|null;
   generated: boolean;
   name: string;
   text: string;
@@ -47,4 +47,11 @@ export interface Poem {
 export interface CreatePoemResponse {
   created: boolean;
   poem: Poem;
+}
+
+// Models the response for the /api/get_poems/<poemType>/<numPoems>/<email?>
+// endpoint
+export interface GetPoemsResponse {
+  type: string;
+  poems: Poem[];
 }

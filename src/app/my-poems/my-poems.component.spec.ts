@@ -4,7 +4,9 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatCardModule} from '@angular/material/card';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatGridListModule} from '@angular/material/grid-list';
+import {BackendService} from '../backend.service';
 import {MyPoemsListComponent} from '../my-poems-list/my-poems-list.component';
+import {BackendServiceStub} from '../testing/backend-service-stub';
 
 import {MyPoemsComponent} from './my-poems.component';
 
@@ -25,6 +27,9 @@ describe('MyPoemsComponent', () => {
           declarations: [
             MyPoemsComponent,
             MyPoemsListComponent,
+          ],
+          providers: [
+            {provide: BackendService, useValue: new BackendServiceStub()},
           ],
         })
         .compileComponents();

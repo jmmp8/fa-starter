@@ -5,6 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatProgressSpinnerHarness} from '@angular/material/progress-spinner/testing';
+import {of} from 'rxjs';
 
 import {AuthService} from '../auth.service';
 import {BackendService} from '../backend.service';
@@ -106,7 +107,10 @@ describe('LoginButtonComponent', () => {
     if (!expectedEmail)
       throw new Error('Auth service stub did not have an email configured');
     authServiceStub.clearUser();
-    spyOn(backendServiceStub, 'createUser');
+
+    // Set up spy for backend stub
+    const spyResponse = backendServiceStub.createUser(expectedEmail);
+    spyOn(backendServiceStub, 'createUser').and.returnValue(spyResponse);
 
     const logInButton = await loader.getHarness(
         MatButtonHarness.with({selector: '.login-button'}));
