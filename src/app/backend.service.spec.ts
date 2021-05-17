@@ -58,10 +58,20 @@ describe('BackendService', () => {
     controller.verify();
   });
 
-  it('should create poems', () => {
+  it('should create manual poems', () => {
     const expectedPoemName = 'testName';
     const expectedPoemText = 'test text\nsecond line';
     const generated = false;
+
+    // Subscribe to the manual poems refresh
+    const manualPoems$ = service.getManualPoems();
+    manualPoems$.subscribe();
+
+    // Expect the initial manual poem fetch
+    let poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
+
 
     // Call the backend create_poem endpoint
     service.createPoem(expectedPoemName, expectedPoemText, generated)
@@ -101,6 +111,11 @@ describe('BackendService', () => {
       },
     };
     req.flush(resp);
+
+    // Creting a poem also refreshes the list of poems
+    poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
 
     // Assert there are no extra requests
     controller.verify();

@@ -10,7 +10,7 @@ import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
   // Subject emits whenever the list of poems needs to be refreshed
-  protected refreshManualPoemsSubject = new Subject<void>();
+  refreshManualPoemsSubject = new Subject<void>();
 
   // Observables for the various types of poems
   readonly manualPoems$ = this.refreshManualPoemsSubject.pipe(
