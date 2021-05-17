@@ -18,9 +18,9 @@ export class MyPoemsEditDialog {
 
   constructor(
       private backendService: BackendService,
-      public dialogRef: MatDialogRef<MyPoemsEditDialog>,
+      private dialogRef: MatDialogRef<MyPoemsEditDialog>,
       @Inject(MAT_DIALOG_DATA) public data: Poem,
-      public snackBar: MatSnackBar,
+      private snackBar: MatSnackBar,
   ) {}
 
   canSubmit(): boolean {
