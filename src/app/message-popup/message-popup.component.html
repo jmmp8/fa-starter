@@ -1,0 +1,7 @@
+<div class="message-text" *ngIf="data$ | async as data; else elseBlock">
+    {{data}}
+    <button mat-stroked-button color="primary" (click)="dismiss()">Dismiss</button>
+</div>
+<ng-template #elseBlock>
+    <div class="message-text">Loading...</div>
+</ng-template>
