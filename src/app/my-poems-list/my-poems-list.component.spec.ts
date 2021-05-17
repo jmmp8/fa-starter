@@ -5,6 +5,7 @@ import {MatCardModule} from '@angular/material/card';
 import {MatCardHarness} from '@angular/material/card/testing';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
+import {firstValueFrom} from 'rxjs';
 import {BackendService} from '../backend.service';
 import {User} from '../backend_response_types';
 import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.component';
@@ -72,26 +73,26 @@ describe('MyPoemsListComponent', () => {
   it('should display the saved manual poems', async () => {
     let myPoemCards = await loader.getAllHarnesses(
         MatCardHarness.with({selector: '.my-poem-card'}));
-    let expectedPoems =
-        await backendServiceStub.getManualPoems(0, testUser.id, false);
+    let expectedPoemsResponse =
+        await firstValueFrom(backendServiceStub._getManualPoemsRequest());
 
     // Check that there is one card for each poem
-    expect(myPoemCards.length).toEqual(expectedPoems.length);
+    expect(myPoemCards.length).toEqual(expectedPoemsResponse.poems.length);
 
     // Add a new manual poem and check again
     backendServiceStub.createPoem('new manual poem', 'some test text', false);
     myPoemCards = await loader.getAllHarnesses(
         MatCardHarness.with({selector: '.my-poem-card'}));
-    expectedPoems =
-        await backendServiceStub.getManualPoems(0, testUser.id, false);
+    expectedPoemsResponse =
+        await firstValueFrom(backendServiceStub._getManualPoemsRequest());
 
     // Check that there is one card for each manual poem including the new one
-    expect(myPoemCards.length).toEqual(expectedPoems.length);
+    expect(myPoemCards.length).toEqual(expectedPoemsResponse.poems.length);
 
     // Check the card contents
     for (let i = 0; i < myPoemCards.length; i++) {
       const card = myPoemCards[i];
-      const poem = expectedPoems[i];
+      const poem = expectedPoemsResponse.poems[i];
 
       expect(await card.getTitleText()).toContain(poem.name);
       expect(await card.getText()).toContain(poem.text);

@@ -75,7 +75,7 @@ export class BackendServiceStub extends BaseBackendService {
 
     this.poem.push(newPoem);
 
-    this.getManualPoems();
+    this.refreshManualPoems();
 
     return of({
       'created': true,
@@ -84,21 +84,29 @@ export class BackendServiceStub extends BaseBackendService {
   }
 
   /**
-   * Test version of the backend service's getManualPoems.
+   * Test version of the backend service's _getPoemsResponse.
    * Includes a few additional parameters and a return value to help testing
    *
+   * @param {string} poemType - one of 'best', 'new', 'manual', 'liked',
+   *     'generated'. Currently only manual is implemented
    * @param {number} numPoems - The maximum number of poems to retrieve
    * @param {number} userId - If supplied, which user to get poems for. Defaults
    *     to the test user
-   * @param {triggerUpdate} - If true, will send the result through the
-   *     service's observables which will trigger UI updates. Set to false to
-   * just get the values that exists to compare to the displayed values
    *
-   * @returns {Peom[]} - The list of manually written poems that match the
-   *     userId, up to numPeoms are returned
+   * @returns {Observable<GetPoemsResponse>} - The list of manually written
+   *     poems that match the userId, up to numPeoms are returned
    */
-  async getManualPoems(numPoems = 0, userId?: number, triggerUpdate = true):
-      Promise<Poem[]> {
+  _getPoemsRequest(poemType: string, numPeoms: number, userId?: number):
+      Observable<GetPoemsResponse> {
+    if (poemType == 'manual') {
+      return this._getManualPoemsRequest(0, userId);
+    } else {
+      throw new Error('Other poem types not yet implemented');
+    }
+  }
+
+  _getManualPoemsRequest(numPoems = 0, userId?: number):
+      Observable<GetPoemsResponse> {
     // Sort the poems by modified timestamp or creation timestamp if no modified
     // timestamp exists
     const getSortValue = (p: Poem) => {
@@ -124,12 +132,6 @@ export class BackendServiceStub extends BaseBackendService {
       manualPoems = manualPoems.slice(0, numPoems);
     }
 
-    // Send the response to the manual poems subject
-    if (triggerUpdate) {
-      const response: GetPoemsResponse = {type: 'manual', poems: manualPoems};
-      this.manualPoemsSubject.next(response);
-    }
-
-    return manualPoems;
+    return of({type: 'manual', poems: manualPoems});
   }
 }
