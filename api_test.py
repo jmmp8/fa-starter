@@ -2,10 +2,11 @@
 import json
 from absl.testing import absltest
 from flask_webtest import TestApp
+from datetime import datetime
 
 from app import app
 
-import api
+import models
 from models import db
 
 
@@ -28,9 +29,15 @@ class DbTest(absltest.TestCase):
 
     @with_app_context
     def wipe_test_data(self):
-        # SQL to wipe the test user from the testing database
+        # SQL to wipe the test user data from the testing database
         wipe_user_sql = f"""
-            DELETE FROM user WHERE user.email = "{self.test_email}"
+            DELETE FROM poem WHERE 
+                EXISTS (SELECT 1 FROM user WHERE
+                    user.id = poem.user_id 
+                    AND user.email = "{self.test_email}"
+                );
+
+            DELETE FROM user WHERE user.email = "{self.test_email}";
         """
         db.session.execute(wipe_user_sql)
         db.session.commit()
@@ -51,6 +58,25 @@ class DbTest(absltest.TestCase):
 
         self.assertEqual(first_create_resp['user']['id'],
                          second_create_resp['user']['id'])
+
+    @with_app_context
+    def test_create_poem(self):
+        # First create user to associate the poem with
+        user = models.User(email=self.test_email)
+        db.session.add(user)
+        db.session.flush()
+
+        # Create poem model
+        poem = models.Poem(user_id=user.id,
+                           creation_timestamp=datetime.now(),
+                           name='test',
+                           text='test')
+        db.session.add(poem)
+        db.session.commit()
+
+        queried_poem = models.Poem.query.filter_by(user_id=user.id).first()
+
+        self.assertEqual(poem.id, queried_poem.id)
 
 
 if __name__ == '__main__':
