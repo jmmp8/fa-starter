@@ -18,14 +18,14 @@ export interface CreateUserResponse {
 
 // Models a row the poem table
 export enum PoemPrivacyLevel {
-  public,
-  private,
+  Public,
+  Private,
 }
 
 export enum PoemForm {
-  haiku,
-  sonnet,
-  tonka,
+  Haiku,
+  Sonnet,
+  Tonka,
 }
 
 export interface Poem {

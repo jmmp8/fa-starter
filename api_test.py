@@ -2,7 +2,6 @@
 import json
 from absl.testing import absltest
 from flask_webtest import TestApp
-from datetime import datetime
 
 from app import app
 
@@ -66,17 +65,49 @@ class DbTest(absltest.TestCase):
         db.session.add(user)
         db.session.flush()
 
-        # Create poem model
-        poem = models.Poem(user_id=user.id,
-                           creation_timestamp=datetime.now(),
-                           name='test',
-                           text='test')
-        db.session.add(poem)
-        db.session.commit()
+        # Call the endpoint
+        poem_name = 'test poem'
+        poem_text = 'test\nthis is a poem\na very good one'
 
-        queried_poem = models.Poem.query.filter_by(user_id=user.id).first()
+        request_body = {
+            'userEmail': user.email,
+            'poemName': poem_name,
+            'poemText': poem_text,
+            'generated': False
+        }
 
-        self.assertEqual(poem.id, queried_poem.id)
+        create = self.w.post_json('/api/create_poem', request_body)
+        create_resp = json.loads(create.body)
+        self.assertTrue(create_resp['created'])
+
+        poem_query = f"""SELECT * FROM poem WHERE EXISTS
+            (SELECT 1 FROM user WHERE 
+                user.id=poem.user_id AND 
+                user.email="{self.test_email}"
+            )
+        """
+        poem_query_result = db.session.execute(poem_query).all()
+        self.assertEqual(len(poem_query_result), 1)
+        self.assertEqual(poem_query_result[0].name, poem_name)
+        self.assertEqual(poem_query_result[0].text, poem_text)
+
+    @with_app_context
+    def test_create_poem_error(self):
+        # Call the endpoint without creating the user first
+        poem_name = 'test poem'
+        poem_text = 'test\nthis is a poem\na very good one'
+
+        request_body = {
+            'userEmail': self.test_email,
+            'poemName': poem_name,
+            'poemText': poem_text,
+            'generated': False
+        }
+
+        with self.assertRaises(ValueError) as context:
+            self.w.post_json('/api/create_poem', request_body)
+        self.assertTrue(
+            'Failed to find a user with email' in str(context.exception))
 
 
 if __name__ == '__main__':

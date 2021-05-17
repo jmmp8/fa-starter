@@ -4,14 +4,14 @@ from .base import db, BaseModel
 
 
 class PoemPrivacyLevel(Enum):
-    PUBLIC = "public"
-    PRIVATE = "private"
+    PUBLIC = "Public"
+    PRIVATE = "Private"
 
 
 class PoemForm(Enum):
-    HAIKU = "haiku"
-    SONNET = "sonnet"
-    TONKA = "tonka"
+    HAIKU = "Haiku"
+    SONNET = "Sonnet"
+    TONKA = "Tonka"
 
 
 class Poem(BaseModel):
