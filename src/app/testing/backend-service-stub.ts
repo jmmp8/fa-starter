@@ -53,7 +53,7 @@ export class BackendServiceStub extends BaseBackendService {
   }
 
   createPoem(poemName: string, poemText: string, generated: boolean):
-      Observable<CreatePoemResponse> {
+      Observable<CreatePoemResponse|undefined> {
     if (!this.user.length) {
       throw new Error('No user to create poem for');
     }
