@@ -7,6 +7,7 @@ import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatProgressSpinnerHarness} from '@angular/material/progress-spinner/testing';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {firstValueFrom, of} from 'rxjs';
 
 import {AuthService} from '../auth.service';
@@ -32,6 +33,7 @@ describe('LoginButtonComponent', () => {
     await TestBed
         .configureTestingModule({
           imports: [
+            BrowserAnimationsModule,
             CommonModule,
             MatButtonModule,
             MatProgressSpinnerModule,
@@ -147,4 +149,35 @@ describe('LoginButtonComponent', () => {
         MatProgressSpinnerHarness.with({selector: '.login-spinner'}));
     expect(spinner).toBeDefined();
   });
+
+  it('should show a failure message if the backend returns an error',
+     async () => {
+       const expectedEmail = authServiceStub.getUserEmail();
+       if (!expectedEmail)
+         throw new Error('Auth service stub did not have an email configured');
+       authServiceStub.clearUser();
+
+       // Set up spies on dialog box and backend service
+       const snackBar = TestBed.inject(MatSnackBar);
+       const snackBarSpy = spyOn(snackBar, 'openFromComponent');
+
+       spyOn(backendServiceStub, 'createUser').and.returnValue(of(undefined));
+
+       const logInButton = await loader.getHarness(
+           MatButtonHarness.with({selector: '.login-button'}));
+       await logInButton.click();
+
+       expect(backendServiceStub.createUser)
+           .toHaveBeenCalledOnceWith(expectedEmail);
+
+       // Check that the snackBar was called correctly
+       const snackBarSpyArgs = snackBarSpy.calls.mostRecent().args;
+       expect(snackBarSpy).toHaveBeenCalled();
+       expect(snackBarSpyArgs[0]).toBe(MessagePopup);
+
+       if (!snackBarSpyArgs[1])
+         throw new Error('Failed to find second argument for popup message');
+       expect(await firstValueFrom(snackBarSpyArgs[1].data))
+           .toContain('Server communication failed.');
+     });
 });
