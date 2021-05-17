@@ -6,6 +6,7 @@ import {MatCardHarness} from '@angular/material/card/testing';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {MatDialogHarness} from '@angular/material/dialog/testing';
 import {BackendService} from '../backend.service';
+import {User} from '../backend_response_types';
 import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.component';
 import {BackendServiceStub} from '../testing/backend-service-stub';
 
@@ -16,9 +17,11 @@ describe('MyPoemsListComponent', () => {
   let component: MyPoemsListComponent;
   let fixture: ComponentFixture<MyPoemsListComponent>;
   let loader: HarnessLoader;
+  let testUser: User;
 
   beforeEach(async () => {
     backendServiceStub = new BackendServiceStub();
+    testUser = backendServiceStub.user[0];
 
     await TestBed
         .configureTestingModule({
@@ -39,6 +42,7 @@ describe('MyPoemsListComponent', () => {
     component = fixture.componentInstance;
     loader = TestbedHarnessEnvironment.loader(fixture);
     fixture.detectChanges();
+    backendServiceStub.getManualPoems();
   });
 
   it('should create', () => {
@@ -63,5 +67,34 @@ describe('MyPoemsListComponent', () => {
             MyPoemsEditDialog,
             {data: undefined},
         );
+  });
+
+  it('should display the saved manual poems', async () => {
+    let myPoemCards = await loader.getAllHarnesses(
+        MatCardHarness.with({selector: '.my-poem-card'}));
+    let expectedPoems =
+        await backendServiceStub.getManualPoems(0, testUser.id, false);
+
+    // Check that there is one card for each poem
+    expect(myPoemCards.length).toEqual(expectedPoems.length);
+
+    // Add a new manual poem and check again
+    backendServiceStub.createPoem('new manual poem', 'some test text', false);
+    myPoemCards = await loader.getAllHarnesses(
+        MatCardHarness.with({selector: '.my-poem-card'}));
+    expectedPoems =
+        await backendServiceStub.getManualPoems(0, testUser.id, false);
+
+    // Check that there is one card for each manual poem including the new one
+    expect(myPoemCards.length).toEqual(expectedPoems.length);
+
+    // Check the card contents
+    for (let i = 0; i < myPoemCards.length; i++) {
+      const card = myPoemCards[i];
+      const poem = expectedPoems[i];
+
+      expect(await card.getTitleText()).toContain(poem.name);
+      expect(await card.getText()).toContain(poem.text);
+    }
   });
 });

@@ -102,6 +102,11 @@ describe('BackendService', () => {
     };
     req.flush(resp);
 
+    // Creating a poem also triggers a refetch of the manual poems
+    const poemsReq = controller.expectOne(`${
+        backendUrl}/api/get_poems/manual/0/${authServiceStub.getUserEmail()}`);
+    poemsReq.flush(null);
+
     // Assert there are no extra requests
     controller.verify();
   });

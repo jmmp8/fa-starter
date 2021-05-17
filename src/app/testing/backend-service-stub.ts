@@ -12,8 +12,21 @@ export class BackendServiceStub extends BaseBackendService {
     super();
 
     // Initialize fake tables with testing data
-    this.user = [{'id': 1, 'email': 'user@gmail.com'}];
-    this.poem = [];
+    this.user = [{'id': 1, 'email': 'test_user@gmail.com'}];
+    this.poem = [{
+      'id': 1,
+      'user_id': this.user[0].id,
+      'creation_timestamp': new Date(),
+      'modified_timestamp': null,
+      'privacy_level': PoemPrivacyLevel.Public,
+      'archived': true,
+      'form': null,
+      'generated': false,
+      'name': 'test poem',
+      'text': 'test\ntext',
+      'num_likes': 0,
+      'num_dislikes': 0,
+    }];
   }
 
   createUser(email: string): Observable<CreateUserResponse> {
@@ -62,16 +75,33 @@ export class BackendServiceStub extends BaseBackendService {
 
     this.poem.push(newPoem);
 
+    this.getManualPoems();
+
     return of({
       'created': true,
       'poem': newPoem,
     });
   }
 
-  async getManualPoems(numPoems = 0): Promise<void> {
+  /**
+   * Test version of the backend service's getManualPoems.
+   * Includes a few additional parameters and a return value to help testing
+   *
+   * @param {number} numPoems - The maximum number of poems to retrieve
+   * @param {number} userId - If supplied, which user to get poems for. Defaults
+   *     to the test user
+   * @param {triggerUpdate} - If true, will send the result through the
+   *     service's observables which will trigger UI updates. Set to false to
+   * just get the values that exists to compare to the displayed values
+   *
+   * @returns {Peom[]} - The list of manually written poems that match the
+   *     userId, up to numPeoms are returned
+   */
+  async getManualPoems(numPoems = 0, userId?: number, triggerUpdate = true):
+      Promise<Poem[]> {
     // Sort the poems by modified timestamp or creation timestamp if no modified
     // timestamp exists
-    const getSortValue = function(p: Poem) {
+    const getSortValue = (p: Poem) => {
       if (p.modified_timestamp) {
         return p.modified_timestamp.getTime();
       } else if (p.creation_timestamp) {
@@ -81,17 +111,25 @@ export class BackendServiceStub extends BaseBackendService {
       }
     };
 
+    if (userId == undefined) {
+      userId = this.user[0].id;
+    }
+
     // Retrieve manually written poems, sorted by timestamp, limited to numPoems
     // entries
-    const manualPoems =
-        this.poem
-            .filter(
-                poem => !poem.generated && (poem.user_id == this.user[0].id))
-            .sort((a, b) => getSortValue(b) - getSortValue(a))
-            .slice(numPoems);
+    let manualPoems =
+        this.poem.filter(poem => !poem.generated && (poem.user_id == userId))
+            .sort((a, b) => getSortValue(b) - getSortValue(a));
+    if (manualPoems.length > numPoems && numPoems > 0) {
+      manualPoems = manualPoems.slice(0, numPoems);
+    }
 
     // Send the response to the manual poems subject
-    const response: GetPoemsResponse = {type: 'manual', poems: manualPoems};
-    this.manualPoemsSubject.next(response);
+    if (triggerUpdate) {
+      const response: GetPoemsResponse = {type: 'manual', poems: manualPoems};
+      this.manualPoemsSubject.next(response);
+    }
+
+    return manualPoems;
   }
 }

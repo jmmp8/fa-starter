@@ -1,7 +1,7 @@
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {firstValueFrom, Observable, of, Subject} from 'rxjs';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
@@ -70,7 +70,10 @@ export class BackendService extends BaseBackendService {
     const endpoint = `${this.url}/api/create_poem`;
     return this.http
         .post<CreatePoemResponse>(endpoint, requestBody, this.httpOptions)
-        .pipe(catchError(this.handleError<CreatePoemResponse>('createPoem')));
+        .pipe(
+            catchError(this.handleError<CreatePoemResponse>('createPoem')),
+            tap(_ => this.getManualPoems()),
+        );
   }
 
   async getManualPoems(numPoems = 0): Promise<void> {

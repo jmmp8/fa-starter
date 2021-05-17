@@ -1,5 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
+import {Observable} from 'rxjs';
+import {BackendService} from '../backend.service';
 import {Poem} from '../backend_response_types';
 import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.component';
 
@@ -8,8 +10,17 @@ import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.co
   templateUrl: './my-poems-list.component.html',
   styleUrls: ['./my-poems-list.component.css']
 })
-export class MyPoemsListComponent {
-  constructor(public editDialog: MatDialog) {}
+export class MyPoemsListComponent implements OnInit {
+  readonly myPoems$: Observable<Poem[]> = this.backendService.manualPoems$;
+
+  constructor(
+      private backendService: BackendService,
+      public editDialog: MatDialog,
+  ) {}
+
+  ngOnInit(): void {
+    this.backendService.getManualPoems();
+  }
 
   async openEditDialog(poem?: Poem): Promise<void> {
     this.editDialog.open(
