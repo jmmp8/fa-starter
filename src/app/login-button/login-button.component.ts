@@ -1,7 +1,9 @@
 import {Component} from '@angular/core';
-import {firstValueFrom} from 'rxjs';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {map, tap} from 'rxjs/operators';
 import {AuthService} from '../auth.service';
 import {BackendService} from '../backend.service';
+import {MessagePopup} from '../message-popup/message-popup.component';
 
 @Component({
   selector: 'app-login-button',
@@ -14,28 +16,33 @@ export class LoginButtonComponent {
   constructor(
       private authService: AuthService,
       private backendService: BackendService,
+      private snackBar: MatSnackBar,
   ) {}
 
   async logInOrOut(): Promise<void> {
-    try {
+    await this.authService.logInOrOut();
+
+    const userEmail = this.getUserEmail();
+    if (userEmail) {
       this.isLoggingIn = true;
-      await this.authService.logInOrOut();
 
-      const userEmail = this.getUserEmail();
-      if (userEmail) {
-        const response =
-            await firstValueFrom(this.backendService.createUser(userEmail));
-
-        if (!response) {
-          console.log('bad response:', response);
-          console.error(
-              'Failed to get a response from the backend for creating a user');
-        } else {
-          console.log(response);
-        }
-      }
-    } finally {
-      this.isLoggingIn = false;
+      this.snackBar.openFromComponent(
+          MessagePopup,
+          {
+            data: this.backendService.createUser(userEmail).pipe(
+                tap(_ => this.isLoggingIn = false),
+                map((response) => {
+                  if (response) {
+                    return response.created ? 'Your user has been created.' :
+                                              'Sign on successful.';
+                  } else {
+                    this.authService.logOut();
+                    return 'Server communication failed.';
+                  }
+                }),
+                )
+          },
+      );
     }
   }
 

@@ -1,14 +1,17 @@
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatButtonHarness} from '@angular/material/button/testing';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatProgressSpinnerHarness} from '@angular/material/progress-spinner/testing';
-import {of} from 'rxjs';
+import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {firstValueFrom, of} from 'rxjs';
 
 import {AuthService} from '../auth.service';
 import {BackendService} from '../backend.service';
+import {MessagePopup} from '../message-popup/message-popup.component';
 import {AuthServiceStub} from '../testing/auth-service-stub';
 import {BackendServiceStub} from '../testing/backend-service-stub';
 
@@ -29,10 +32,15 @@ describe('LoginButtonComponent', () => {
     await TestBed
         .configureTestingModule({
           imports: [
+            CommonModule,
             MatButtonModule,
             MatProgressSpinnerModule,
+            MatSnackBarModule,
           ],
-          declarations: [LoginButtonComponent],
+          declarations: [
+            LoginButtonComponent,
+            MessagePopup,
+          ],
           providers: [
             {provide: AuthService, useValue: authServiceStub},
             {provide: BackendService, useValue: backendServiceStub},
@@ -108,7 +116,10 @@ describe('LoginButtonComponent', () => {
       throw new Error('Auth service stub did not have an email configured');
     authServiceStub.clearUser();
 
-    // Set up spy for backend stub
+    // Set up spies on dialog box and backend service
+    const snackBar = TestBed.inject(MatSnackBar);
+    const snackBarSpy = spyOn(snackBar, 'openFromComponent');
+
     const spyResponse = backendServiceStub.createUser(expectedEmail);
     spyOn(backendServiceStub, 'createUser').and.returnValue(spyResponse);
 
@@ -118,6 +129,16 @@ describe('LoginButtonComponent', () => {
 
     expect(backendServiceStub.createUser)
         .toHaveBeenCalledOnceWith(expectedEmail);
+
+    // Check that the snackBar was called correctly
+    const snackBarSpyArgs = snackBarSpy.calls.mostRecent().args;
+    expect(snackBarSpy).toHaveBeenCalled();
+    expect(snackBarSpyArgs[0]).toBe(MessagePopup);
+
+    if (!snackBarSpyArgs[1])
+      throw new Error('Failed to find second argument for popup message');
+    expect(await firstValueFrom(snackBarSpyArgs[1].data))
+        .toContain('Your user has been created.');
   });
 
   it('should show a spinner while login is in progress', async () => {
