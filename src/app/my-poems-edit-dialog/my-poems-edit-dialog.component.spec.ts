@@ -11,7 +11,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatInputHarness} from '@angular/material/input/testing';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {firstValueFrom} from 'rxjs';
+import {firstValueFrom, of} from 'rxjs';
 
 import {BackendService} from '../backend.service';
 import {MessagePopup} from '../message-popup/message-popup.component';
@@ -135,5 +135,42 @@ describe('MyPoemsEditDialog', () => {
       throw new Error('Failed to find second argument for popup message');
     expect(await firstValueFrom(snackBarSpyArgs[1].data))
         .toContain('Poem Created!');
+  });
+
+  it('should send an error message if the poem creation fails', async () => {
+    // Spy on the backend service's createPoem and make sure it returns an error
+    // value
+    spyOn(backendServiceStub, 'createPoem').and.returnValue(of(undefined));
+
+    const testName = 'testName';
+    const testPoem = 'testPoem';
+
+    // Set up spy on dialog box
+    const snackBar = TestBed.inject(MatSnackBar);
+    const snackBarSpy = spyOn(snackBar, 'openFromComponent');
+
+    // Simulate the poem submission
+    const submitButton = await loader.getHarness(
+        MatButtonHarness.with({selector: '.poem-edit-submit'}));
+    const poemNameField = await loader.getHarness(
+        MatInputHarness.with({selector: '.poem-name-field'}));
+    const poemTextField = await loader.getHarness(
+        MatInputHarness.with({selector: '.poem-text-field'}));
+
+    await poemNameField.setValue(testName);
+    await poemTextField.setValue(testPoem);
+    await submitButton.click();
+
+    expect(backendServiceStub.createPoem)
+        .toHaveBeenCalledWith(testName, testPoem, false);
+
+    const snackBarSpyArgs = snackBarSpy.calls.mostRecent().args;
+    expect(snackBarSpy).toHaveBeenCalled();
+    expect(snackBarSpyArgs[0]).toBe(MessagePopup);
+
+    if (!snackBarSpyArgs[1])
+      throw new Error('Failed to find second argument for popup message');
+    expect(await firstValueFrom(snackBarSpyArgs[1].data))
+        .toContain('Failed to create poem.');
   });
 });

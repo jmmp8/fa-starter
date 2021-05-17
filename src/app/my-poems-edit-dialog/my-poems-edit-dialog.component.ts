@@ -35,7 +35,9 @@ export class MyPoemsEditDialog {
           {
             data: this.backendService
                       .createPoem(this.poemName, this.poemText, false)
-                      .pipe(map(() => 'Poem Created!'))
+                      .pipe(
+                          map(response => response ? 'Poem Created!' :
+                                                     'Failed to create poem.'))
           },
       );
     }
