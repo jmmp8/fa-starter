@@ -143,6 +143,38 @@ describe('LoginButtonComponent', () => {
         .toContain('Your user has been created.');
   });
 
+  it('should confirm the user\'s existance if they have logged in before',
+     async () => {
+       // Use an already existing email
+       const expectedEmail = backendServiceStub.user[0].email;
+       if (!expectedEmail)
+         throw new Error('Auth service stub did not have an email configured');
+       authServiceStub.clearUser();
+
+       // Set up spies on dialog box and backend service
+       const snackBar = TestBed.inject(MatSnackBar);
+       const snackBarSpy = spyOn(snackBar, 'openFromComponent');
+
+       const spyResponse = backendServiceStub.createUser(expectedEmail);
+       spyOn(backendServiceStub, 'createUser').and.returnValue(spyResponse);
+
+       const logInButton = await loader.getHarness(
+           MatButtonHarness.with({selector: '.login-button'}));
+       await logInButton.click();
+
+       expect(backendServiceStub.createUser).toHaveBeenCalled();
+
+       // Check that the snackBar was called correctly
+       const snackBarSpyArgs = snackBarSpy.calls.mostRecent().args;
+       expect(snackBarSpy).toHaveBeenCalled();
+       expect(snackBarSpyArgs[0]).toBe(MessagePopup);
+
+       if (!snackBarSpyArgs[1])
+         throw new Error('Failed to find second argument for popup message');
+       expect(await firstValueFrom(snackBarSpyArgs[1].data))
+           .toContain('Sign on successful.');
+     });
+
   it('should show a spinner while login is in progress', async () => {
     component.isLoggingIn = true;
     const spinner = await loader.getHarness(
