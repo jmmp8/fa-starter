@@ -4,6 +4,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 
@@ -28,6 +29,7 @@ describe('AppComponent', () => {
             MatDividerModule,
             MatGridListModule,
             MatProgressSpinnerModule,
+            MatSnackBarModule,
             RouterTestingModule.withRoutes(routes),
           ],
           declarations: [

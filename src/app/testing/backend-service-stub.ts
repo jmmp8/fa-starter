@@ -29,7 +29,7 @@ export class BackendServiceStub extends BaseBackendService {
     }];
   }
 
-  createUser(email: string): Observable<CreateUserResponse> {
+  createUser(email: string): Observable<CreateUserResponse|undefined> {
     let created = false;
     let userRow: User|undefined =
         this.user.find(u => u.email.toLowerCase() === email.toLowerCase());

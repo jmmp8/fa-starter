@@ -21,7 +21,7 @@ export abstract class BaseBackendService {
 
   // Functions to create new information. The backend will create new rows
   // in the database
-  abstract createUser(email: string): Observable<CreateUserResponse>;
+  abstract createUser(email: string): Observable<CreateUserResponse|undefined>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
       Observable<CreatePoemResponse|undefined>;
 
@@ -61,7 +61,7 @@ export class BackendService extends BaseBackendService {
     };
   }
 
-  createUser(email: string): Observable<CreateUserResponse> {
+  createUser(email: string): Observable<CreateUserResponse|undefined> {
     const endpoint = `${this.url}/api/create_user/${email}`;
     return this.http.get<CreateUserResponse>(endpoint).pipe(
         catchError(this.handleError<CreateUserResponse>('createUser')));
