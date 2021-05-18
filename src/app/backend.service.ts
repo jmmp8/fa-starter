@@ -23,7 +23,7 @@ export abstract class BaseBackendService {
   // in the database
   abstract createUser(email: string): Observable<CreateUserResponse>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
-      Observable<CreatePoemResponse>;
+      Observable<CreatePoemResponse|undefined>;
 
   // Functions that trigger an update to a poem observable or return an
   // observable that the front end can subscribe to
@@ -68,7 +68,7 @@ export class BackendService extends BaseBackendService {
   }
 
   createPoem(poemName: string, poemText: string, generated: boolean):
-      Observable<CreatePoemResponse> {
+      Observable<CreatePoemResponse|undefined> {
     // There must be a user logged in to associate with the new poem
     const userEmail: string|undefined = this.auth.getUserEmail();
     if (!userEmail)

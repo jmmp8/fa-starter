@@ -1,4 +1,4 @@
-import {Location} from '@angular/common';
+import {CommonModule, Location} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatButtonModule} from '@angular/material/button';
 import {MatDividerModule} from '@angular/material/divider';
@@ -23,6 +23,7 @@ describe('AppComponent', () => {
     TestBed
         .configureTestingModule({
           imports: [
+            CommonModule,
             MatButtonModule,
             MatDividerModule,
             MatGridListModule,

@@ -13,6 +13,8 @@ import {MyPoemsEditDialog} from '../my-poems-edit-dialog/my-poems-edit-dialog.co
 export class MyPoemsListComponent implements OnInit {
   readonly myPoems$: Observable<Poem[]> = this.backendService.manualPoems$;
 
+  newPoemMessage$?: Observable<string>;
+
   constructor(
       private backendService: BackendService,
       public editDialog: MatDialog,

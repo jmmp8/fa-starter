@@ -1,10 +1,10 @@
 import {HarnessLoader} from '@angular/cdk/testing';
 import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatCardModule} from '@angular/material/card';
 import {MatCardHarness} from '@angular/material/card/testing';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
-import {MatDialogHarness} from '@angular/material/dialog/testing';
 import {firstValueFrom} from 'rxjs';
 import {BackendService} from '../backend.service';
 import {User} from '../backend_response_types';
@@ -27,6 +27,7 @@ describe('MyPoemsListComponent', () => {
     await TestBed
         .configureTestingModule({
           imports: [
+            CommonModule,
             MatCardModule,
             MatDialogModule,
           ],

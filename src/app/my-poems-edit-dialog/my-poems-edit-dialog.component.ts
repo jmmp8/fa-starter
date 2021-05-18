@@ -1,9 +1,11 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {firstValueFrom} from 'rxjs';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {map} from 'rxjs/operators';
 import {BackendService} from '../backend.service';
 
 import {Poem} from '../backend_response_types';
+import {MessagePopup} from '../message-popup/message-popup.component';
 
 @Component({
   selector: 'app-my-poems-edit-dialog',
@@ -16,8 +18,9 @@ export class MyPoemsEditDialog {
 
   constructor(
       private backendService: BackendService,
-      public dialogRef: MatDialogRef<MyPoemsEditDialog>,
+      private dialogRef: MatDialogRef<MyPoemsEditDialog>,
       @Inject(MAT_DIALOG_DATA) public data: Poem,
+      private snackBar: MatSnackBar,
   ) {}
 
   canSubmit(): boolean {
@@ -27,13 +30,16 @@ export class MyPoemsEditDialog {
 
   async submit(): Promise<void> {
     if (this.canSubmit()) {
-      const response = await firstValueFrom(
-          this.backendService.createPoem(this.poemName, this.poemText, false));
-
-      if (!response) {
-        throw new Error(
-            'Failed to get a response from the backend for creating a poem');
-      }
+      this.snackBar.openFromComponent(
+          MessagePopup,
+          {
+            data: this.backendService
+                      .createPoem(this.poemName, this.poemText, false)
+                      .pipe(
+                          map(response => response ? 'Poem Created!' :
+                                                     'Failed to create poem.'))
+          },
+      );
     }
     this.dialogRef.close();
   }
