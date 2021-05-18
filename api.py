@@ -137,3 +137,20 @@ def get_poems(poem_type, num_poems, user_email):
 
     result = {'type': poem_type, 'poems': poems}
     return json.dumps(result, cls=models.ModelEncoder)
+
+
+@blueprint.route('/edit_poem/<int:poem_id>', methods=['POST'])
+def edit_poem(poem_id):
+    # Check that the poem exists
+    original_poem = models.Poem.query.filter_by(id=poem_id)
+    if not original_poem:
+        raise ValueError(f'Failed to find an existing poem with id: {poem_id}')
+
+    # Set the poem's name and text and update modified time
+    body = flask.request.get_json()
+    edited_poem = body['poem']
+    original_poem.name = edited_poem.name
+    original_poem.text = edited_poem.text
+    original_poem.modified_timestamp = datetime.now()
+
+    db.session.commit()
