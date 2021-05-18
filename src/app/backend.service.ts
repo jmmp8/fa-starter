@@ -78,7 +78,7 @@ export class BackendService extends BaseBackendService {
     const requestBody = {
       userEmail: userEmail,
       poemName: poemName.trim(),
-      poemText: poemText.trim(),
+      poemText: poemText,
       generated: generated,
     };
 

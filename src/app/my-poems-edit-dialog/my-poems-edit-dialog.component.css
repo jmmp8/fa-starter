@@ -9,3 +9,7 @@
 .poem-edit-form button {
     margin: 0px 5px;
 }
+
+.poem-edit-form .poem-text-field {
+    font-family: monospace;
+}
