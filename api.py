@@ -137,3 +137,53 @@ def get_poems(poem_type, num_poems, user_email):
 
     result = {'type': poem_type, 'poems': poems}
     return json.dumps(result, cls=models.ModelEncoder)
+
+
+@blueprint.route('/edit_poem/<int:poem_id>', methods=['POST'])
+def edit_poem(poem_id):
+    """Edit's a poem's name and text.
+
+    A request body of the structure:
+    {
+        'poem': Poem
+    }
+    is expected. The poem in the body should have the modified name and text
+    and it's ID should match the poem_id in the route. The database row's
+    modified_timestamp column will also be updated.
+
+    Args:
+        poem_id (int): the ID of the poem to edit
+
+    Raises:
+        ValueError: Raised when the poem_id doesn't exist or
+            when the body's poem ID doesn't match poem_id
+
+    Returns:
+        string: json string representing a dictionary like:
+        {
+            'edited': boolean,
+            'poem': Poem
+        }
+    """
+    # Check that the poem exists
+    original_poem = models.Poem.query.filter_by(id=poem_id).first()
+    if not original_poem:
+        raise ValueError(f'Failed to find an existing poem with id: {poem_id}')
+
+    # Set the poem's name and text and update modified time
+    body = flask.request.get_json()
+    edited_poem = body['poem']
+    if edited_poem['id'] != poem_id:
+        edited_id = edited_poem['id']
+        raise ValueError(
+            f'Edited poem id ({edited_id}) does not match expected id ({poem_id})'
+        )
+
+    original_poem.name = edited_poem['name']
+    original_poem.text = edited_poem['text']
+    original_poem.modified_timestamp = datetime.now()
+
+    db.session.commit()
+
+    result = {'edited': True, 'poem': original_poem}
+    return json.dumps(result, cls=models.ModelEncoder)
