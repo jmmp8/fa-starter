@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {Observable, of} from 'rxjs';
 import {BaseBackendService} from '../backend.service';
-import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem, PoemForm, PoemPrivacyLevel, User} from '../backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, EditPoemResponse, GetPoemsResponse, Poem, PoemForm, PoemPrivacyLevel, User} from '../backend_response_types';
 
 export class BackendServiceStub extends BaseBackendService {
   /* These properties replace the actual database tables for testing */
@@ -79,8 +79,22 @@ export class BackendServiceStub extends BaseBackendService {
 
     return of({
       'created': true,
-      'poem': newPoem,
+      'poem': Object.assign({}, newPoem),
     });
+  }
+
+  editPoem(editedPoem: Poem): Observable<EditPoemResponse> {
+    const originalPoem: Poem|undefined =
+        this.poem.find(p => p.id == editedPoem.id);
+    if (editedPoem.id == undefined || !originalPoem) {
+      throw new Error(`Failed to find a poem with id ${editedPoem.id}`);
+    }
+
+    originalPoem.name = editedPoem.name;
+    originalPoem.text = editedPoem.text;
+    originalPoem.modified_timestamp = new Date();
+
+    return of({edited: true, poem: originalPoem});
   }
 
   /**
@@ -124,10 +138,11 @@ export class BackendServiceStub extends BaseBackendService {
     }
 
     // Retrieve manually written poems, sorted by timestamp, limited to numPoems
-    // entries
+    // entries. Also return copies of the poems instead of just the objects
     let manualPoems =
         this.poem.filter(poem => !poem.generated && (poem.user_id == userId))
-            .sort((a, b) => getSortValue(b) - getSortValue(a));
+            .sort((a, b) => getSortValue(b) - getSortValue(a))
+            .map(p => Object.assign({}, p));
     if (manualPoems.length > numPoems && numPoems > 0) {
       manualPoems = manualPoems.slice(0, numPoems);
     }

@@ -55,3 +55,9 @@ export interface GetPoemsResponse {
   type: string;
   poems: Poem[];
 }
+
+// Models the response for the /api/edit_poem/<int:poemId> endpoint
+export interface EditPoemResponse {
+  edited: boolean;
+  poem: Poem;
+}

@@ -4,8 +4,9 @@ import {firstValueFrom, Observable, of, Subject} from 'rxjs';
 import {catchError, map, mergeMap, startWith, tap} from 'rxjs/operators';
 
 import {environment} from '../environments/environment';
+
 import {AuthService} from './auth.service';
-import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, Poem} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, EditPoemResponse, GetPoemsResponse, Poem} from './backend_response_types';
 
 @Injectable({providedIn: 'root'})
 export abstract class BaseBackendService {
@@ -24,6 +25,7 @@ export abstract class BaseBackendService {
   abstract createUser(email: string): Observable<CreateUserResponse|undefined>;
   abstract createPoem(poemName: string, poemText: string, generated: boolean):
       Observable<CreatePoemResponse|undefined>;
+  abstract editPoem(editedPoem: Poem): Observable<EditPoemResponse|undefined>;
 
   // Functions that trigger an update to a poem observable or return an
   // observable that the front end can subscribe to
@@ -88,6 +90,22 @@ export class BackendService extends BaseBackendService {
         .post<CreatePoemResponse>(endpoint, requestBody, this.httpOptions)
         .pipe(
             catchError(this.handleError<CreatePoemResponse>('createPoem')),
+            tap(_ => this.refreshManualPoems()),
+        );
+  }
+
+  editPoem(editedPoem: Poem): Observable<EditPoemResponse|undefined> {
+    if (editedPoem.id == undefined) {
+      throw new Error('An edited poem must have an ID');
+    }
+
+    const endpoint = `${this.url}/api/edit_poem/${editedPoem.id}`;
+    const requestBody = {poem: editedPoem};
+
+    return this.http
+        .post<EditPoemResponse>(endpoint, requestBody, this.httpOptions)
+        .pipe(
+            catchError(this.handleError<EditPoemResponse>('editPoem')),
             tap(_ => this.refreshManualPoems()),
         );
   }
