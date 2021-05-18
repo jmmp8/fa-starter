@@ -8,4 +8,6 @@
 
 .my-poem-card .my-poem-text {
     white-space: pre;
+    font-family: monospace;
+    text-align: left;
 }

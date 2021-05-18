@@ -60,7 +60,7 @@ describe('BackendService', () => {
 
   it('should create manual poems', () => {
     const expectedPoemName = 'testName';
-    const expectedPoemText = 'test text\nsecond line';
+    const expectedPoemText = '   test text   \n  second   line  ';
     const generated = false;
 
     // Subscribe to the manual poems refresh
