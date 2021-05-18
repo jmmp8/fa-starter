@@ -35,7 +35,7 @@ class DbTest(absltest.TestCase):
                 EXISTS (SELECT 1 FROM user WHERE
                     user.id = poem.user_id 
                     AND user.email = "{self.test_email}"
-                );
+                ) OR poem.id = 0;
 
             DELETE FROM user WHERE user.email = "{self.test_email}";
         """
@@ -144,7 +144,7 @@ class DbTest(absltest.TestCase):
 
         # Query for all the manual poems
         url = f'/api/get_poems/manual/0/{user.email}'
-        get = self.w.get(f'/api/get_poems/manual/0/{user.email}')
+        get = self.w.get(url)
         get_resp = json.loads(get.body)
         self.assertEqual(get_resp['type'], 'manual')
 
@@ -194,6 +194,55 @@ class DbTest(absltest.TestCase):
             self.w.get(url)
         self.assertTrue(
             'Failed to find a user with email' in str(context.exception))
+
+    @with_app_context
+    def test_edit_poem(self):
+        user = self.populate_user_data()
+        poems = self.populate_poem_data(user.id, False, 1)
+
+        edited_poem = poems[0]
+        edited_poem.name = edited_poem.name + ' EDITED'
+        edited_poem.text = edited_poem.text + ' EDITED'
+
+        # The webtest library expects a dictionary passed as the request body.
+        # Serializing and deserializing the body helps it understand the
+        # structure of the Poem
+        request_body = json.loads(
+            json.dumps({'poem': edited_poem}, cls=models.ModelEncoder))
+
+        edit = self.w.post_json(f'/api/edit_poem/{edited_poem.id}',
+                                request_body)
+        edit_resp = json.loads(edit.body)
+        self.assertTrue(edit_resp['edited'])
+
+        # Make sure the correct fields were modified
+        response_poem = edit_resp['poem']
+        self.assertEqual(response_poem['user_id'], edited_poem.user_id)
+        self.assertEqual(response_poem['creation_timestamp'],
+                         str(edited_poem.creation_timestamp))
+        self.assertNotEqual(response_poem['modified_timestamp'],
+                            edited_poem.modified_timestamp)
+        self.assertEqual(response_poem['name'], edited_poem.name)
+        self.assertEqual(response_poem['text'], edited_poem.text)
+
+    @with_app_context
+    def test_edit_poems_bad_id_error(self):
+        with self.assertRaises(ValueError) as context:
+            self.w.post_json('/api/edit_poem/0', {})
+        self.assertTrue('Failed to find an existing poem with id' in str(
+            context.exception))
+
+    @with_app_context
+    def test_edit_poems_mismatch_id_error(self):
+        user = self.populate_user_data()
+        poems = self.populate_poem_data(user.id, False, 1)
+
+        with self.assertRaises(ValueError) as context:
+            self.w.post_json(f'/api/edit_poem/{poems[0].id}',
+                             {'poem': {
+                                 'id': 1
+                             }})
+        self.assertTrue('does not match expected id' in str(context.exception))
 
 
 if __name__ == '__main__':
