@@ -5,7 +5,7 @@ import {environment} from '../environments/environment';
 import {AuthService} from './auth.service';
 
 import {BackendService} from './backend.service';
-import {CreatePoemResponse, CreateUserResponse, GetPoemsResponse, PoemForm, PoemPrivacyLevel} from './backend_response_types';
+import {CreatePoemResponse, CreateUserResponse, EditPoemResponse, GetPoemsResponse, Poem, PoemForm, PoemPrivacyLevel} from './backend_response_types';
 import {AuthServiceStub} from './testing/auth-service-stub';
 
 describe('BackendService', () => {
@@ -150,6 +150,57 @@ describe('BackendService', () => {
       }],
     };
     req.flush(resp);
+
+    // Assert there are no extra requests
+    controller.verify();
+  });
+
+  it('should edit poems', () => {
+    const expectedPoemName = 'testName';
+    const expectedPoemText = '   test text   \n  second   line  ';
+    const generated = false;
+
+    // Subscribe to the manual poems refresh
+    const manualPoems$ = service.getManualPoems();
+    manualPoems$.subscribe();
+
+    // Expect the initial manual poem fetch
+    let poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
+
+    const poemId = 1;
+    const poem: Poem = {
+      'id': poemId,
+      'user_id': 1,
+      'creation_timestamp': new Date(),
+      'modified_timestamp': null,
+      'privacy_level': PoemPrivacyLevel.Public,
+      'archived': true,
+      'form': PoemForm.Haiku,
+      'generated': generated,
+      'name': expectedPoemName,
+      'text': expectedPoemText,
+      'num_likes': 0,
+      'num_dislikes': 0,
+    };
+
+    // Call the backend edit_poem endpoint
+    service.editPoem(poem).subscribe((response: EditPoemResponse) => {
+      expect(response.edited).toBeTrue();
+      expect(response.poem.text).toEqual(expectedPoemText);
+      expect(response.poem.name).toEqual(expectedPoemName);
+    });
+
+    // Make sure we called the correct endpoint
+    const req = controller.expectOne(`${backendUrl}/api/edit_poem/${poemId}`);
+    expect(req.request.method).toEqual('POST');
+    req.flush({edited: true, poem: poem});
+
+    // Editing a poem also refreshes the list of poems
+    poemsReq = controller.expectOne(`${backendUrl}/api/get_poems/manual/0/${
+        authServiceStub.getUserEmail()}`);
+    poemsReq.flush({type: 'manual', poems: []});
 
     // Assert there are no extra requests
     controller.verify();
