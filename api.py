@@ -4,6 +4,7 @@ import flask
 import logging
 import json
 from datetime import datetime
+from sqlalchemy.sql import func
 
 import models
 from models import db
@@ -116,9 +117,10 @@ def get_poems(poem_type, num_poems, user_email):
     elif poem_type == 'manual':
         query = models.Poem.query.filter_by(
             user_id=user.id, generated=False).order_by(
-                models.Poem.modified_timestamp.desc(),
-                models.Poem.creation_timestamp.desc(),
-            )
+                func.ifnull(
+                    models.Poem.modified_timestamp,
+                    models.Poem.creation_timestamp,
+                ).desc())
         if num_poems > 0:
             query = query.limit(num_poems)
         poems = query.all()

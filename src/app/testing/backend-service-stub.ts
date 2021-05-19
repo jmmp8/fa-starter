@@ -83,7 +83,7 @@ export class BackendServiceStub extends BaseBackendService {
     });
   }
 
-  editPoem(editedPoem: Poem): Observable<EditPoemResponse> {
+  editPoem(editedPoem: Poem): Observable<EditPoemResponse|undefined> {
     const originalPoem: Poem|undefined =
         this.poem.find(p => p.id == editedPoem.id);
     if (editedPoem.id == undefined || !originalPoem) {
